@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>JJK: Cursed World</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Segoe UI',sans-serif;}
+#c{display:block;position:fixed;top:0;left:0;}
+
+/* ── HUD ── */
+#hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;}
+#hud-tl{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;min-width:190px;backdrop-filter:blur(8px);}
+#hud-tr{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;text-align:right;backdrop-filter:blur(8px);}
+.hname{font-size:.75rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:7px;}
+.blrow{margin-bottom:5px;}
+.bll{display:flex;justify-content:space-between;font-size:.62rem;color:#999;margin-bottom:2px;}
+.blt{height:7px;background:rgba(255,255,255,.08);border-radius:4px;width:170px;overflow:hidden;}
+.blf{height:100%;border-radius:4px;transition:width .35s ease,background .35s;}
+.hzone{font-size:.6rem;color:#666;letter-spacing:2px;text-transform:uppercase;margin-top:5px;}
+.hlabel{font-size:.6rem;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.hbig{font-size:1.6rem;font-weight:900;color:#fbbf24;}
+
+/* minimap */
+#mm-wrap{position:absolute;bottom:14px;right:14px;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px;pointer-events:none;}
+#mm{display:block;border-radius:4px;}
+.mmlabel{font-size:.55rem;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+
+/* controls hint */
+#hint{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 12px;font-size:.62rem;color:#555;line-height:1.9;letter-spacing:1px;}
+
+/* interaction prompt */
+#interact{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:1px solid rgba(255,215,0,.4);border-radius:8px;padding:8px 18px;font-size:.8rem;color:#fbbf24;letter-spacing:2px;pointer-events:none;opacity:0;transition:opacity .3s;}
+
+/* notification */
+#notif{position:absolute;top:76px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);border:1px solid rgba(255,215,0,.35);border-radius:8px;padding:9px 20px;font-size:.8rem;color:#fbbf24;letter-spacing:2px;text-align:center;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;}
+
+/* ── TITLE ── */
+#title{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 40% 50%,#120a2e,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.ttl{font-size:clamp(3rem,10vw,7rem);font-weight:900;letter-spacing:6px;text-transform:uppercase;background:linear-gradient(135deg,#7b2fff,#ff3a8c,#ff9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 30px rgba(123,47,255,.6));animation:tglow 3s ease-in-out infinite;margin-bottom:6px;}
+.tsub{font-size:clamp(.9rem,2vw,1.4rem);letter-spacing:12px;color:#555;text-transform:uppercase;margin-bottom:10px;}
+.tdesc{font-size:.82rem;color:#444;letter-spacing:1px;margin-bottom:35px;max-width:500px;line-height:1.7;}
+@keyframes tglow{0%,100%{filter:drop-shadow(0 0 20px rgba(123,47,255,.5))}50%{filter:drop-shadow(0 0 55px rgba(123,47,255,.9)) drop-shadow(0 0 80px rgba(255,58,140,.4))}}
+.csel-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;max-width:820px;}
+.ccard{background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.09);border-radius:12px;padding:16px 14px;cursor:pointer;transition:all .2s;width:175px;text-align:center;position:relative;}
+.ccard:hover,.ccard.sel{border-color:var(--a);background:rgba(var(--ar),.12);transform:translateY(-5px);box-shadow:0 8px 28px rgba(var(--ar),.3);}
+.cemoji{font-size:2.4rem;margin-bottom:8px;display:block;}
+.cname{font-size:.72rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:3px;}
+.cgrade{font-size:.58rem;color:#666;letter-spacing:1px;margin-bottom:7px;}
+.cstats{display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:.6rem;color:#888;}
+.cstat{background:rgba(255,255,255,.04);border-radius:4px;padding:2px 5px;}
+.sbtn{background:linear-gradient(135deg,#7b2fff,#4a00b4);border:none;border-radius:8px;padding:15px 55px;color:#fff;font-size:1.1rem;font-weight:700;letter-spacing:4px;cursor:pointer;text-transform:uppercase;transition:all .2s;box-shadow:0 4px 24px rgba(123,47,255,.5);}
+.sbtn:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(123,47,255,.7);}
+.sbtn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+
+/* ── COMBAT ── */
+#combat{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;padding:18px;}
+#combat.on{display:flex;}
+.cfrow{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;width:100%;max-width:820px;margin-bottom:14px;align-items:start;}
+.cfp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;}
+.cfp.pl{border-left:3px solid #7b2fff;}
+.cfp.en{border-right:3px solid #ef4444;}
+.cftop{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.cfav{font-size:2rem;width:46px;height:46px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border-radius:50%;flex-shrink:0;}
+.cfname{font-size:.95rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;}
+.cfgrade{font-size:.58rem;color:#777;letter-spacing:2px;text-transform:uppercase;}
+.cbrow{margin-bottom:5px;}
+.cbll{display:flex;justify-content:space-between;font-size:.62rem;color:#888;margin-bottom:2px;}
+.cbt{height:7px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+.cbf{height:100%;border-radius:4px;transition:width .5s ease;}
+.vs{font-size:1.8rem;font-weight:900;color:#333;display:flex;align-items:center;justify-content:center;padding-top:18px;}
+.clog{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:11px;height:105px;overflow-y:auto;width:100%;max-width:820px;margin-bottom:13px;scroll-behavior:smooth;}
+.clog::-webkit-scrollbar{width:3px;} .clog::-webkit-scrollbar-thumb{background:rgba(123,47,255,.4);}
+.cl{font-size:.8rem;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);animation:cin .3s ease;}
+@keyframes cin{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+.cl-p{color:#a78bfa}.cl-e{color:#f87171}.cl-s{color:#fbbf24;font-style:italic}.cl-d{color:#c084fc;font-weight:700;font-style:italic}.cl-h{color:#4ade80}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:100%;max-width:820px;}
+@media(max-width:580px){.mgrid{grid-template-columns:repeat(2,1fr)}.cfrow{grid-template-columns:1fr}.vs{display:none}}
+.mbtn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:left;color:#e0e0e0;transition:all .2s;width:100%;}
+.mbtn:hover:not(:disabled){border-color:var(--mc,#7b2fff);background:rgba(var(--mr,123,47,255),.12);transform:translateY(-2px);}
+.mbtn:disabled{opacity:.3;cursor:not-allowed;transform:none!important;}
+.mn{font-size:.82rem;font-weight:700;letter-spacing:1px;color:#fff;display:block;margin-bottom:2px;}
+.mc{font-size:.62rem;color:#a855f7;}
+.mt{font-size:.58rem;padding:1px 5px;border-radius:8px;float:right;}
+.ta{background:rgba(239,68,68,.2);color:#f87171}.ts{background:rgba(168,85,247,.2);color:#c084fc}.tb{background:rgba(56,189,248,.2);color:#7dd3fc}.td{background:rgba(255,150,0,.2);color:#fbbf24}
+.eturn{text-align:center;padding:13px;color:#888;font-style:italic;animation:bl 1s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* domain flash */
+.dflash{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(123,47,255,.7),rgba(0,0,0,.97));z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:df 3s ease forwards;pointer-events:none;}
+@keyframes df{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.dt{font-size:clamp(2rem,7vw,4.5rem);font-weight:900;letter-spacing:8px;color:#fff;text-shadow:0 0 40px #7b2fff;text-align:center;}
+.dn{font-size:clamp(1rem,3vw,2rem);letter-spacing:6px;color:#c084fc;margin-top:10px;text-align:center;}
+
+/* dmg popup */
+.dpop{position:fixed;font-size:2rem;font-weight:900;pointer-events:none;animation:dp 1.2s ease forwards;z-index:999;text-shadow:0 2px 8px rgba(0,0,0,.8);}
+@keyframes dp{0%{opacity:1;transform:translateY(0) scale(1)}30%{transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-80px) scale(.8)}}
+
+/* result */
+#result{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+#result.on{display:flex;}
+.remoji{font-size:5rem;margin-bottom:14px;}
+.rtitle{font-size:3rem;font-weight:900;letter-spacing:5px;margin-bottom:7px;}
+.rwin{color:#4ade80;text-shadow:0 0 30px rgba(74,222,128,.5)}.rlose{color:#f87171;text-shadow:0 0 30px rgba(248,113,113,.5)}
+.rsub{color:#777;font-size:.88rem;letter-spacing:2px;margin-bottom:24px;}
+.rbtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.rbtn{padding:12px 28px;border:none;border-radius:6px;font-size:.95rem;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.rp{background:linear-gradient(135deg,#7b2fff,#4a00b4);color:#fff;box-shadow:0 4px 18px rgba(123,47,255,.4);}
+.ro{background:transparent;color:#7b2fff;border:2px solid #7b2fff;}
+.rbtn:hover{transform:translateY(-2px);}
+
+/* ── QUEST LOG PANEL ── */
+#qpanel{
+  position:fixed;top:0;right:0;width:min(380px,100vw);height:100vh;
+  background:rgba(5,3,18,0.97);border-left:1px solid rgba(123,47,255,.25);
+  z-index:60;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+  backdrop-filter:blur(12px);
+}
+#qpanel.open{transform:translateX(0);}
+#qpanel-head{
+  padding:18px 18px 12px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.qp-title{font-size:1rem;font-weight:700;letter-spacing:4px;color:#fff;text-transform:uppercase;}
+.qp-close{background:none;border:1px solid rgba(255,255,255,.1);color:#888;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.8rem;transition:all .2s;}
+.qp-close:hover{border-color:#7b2fff;color:#fff;}
+#qpanel-tabs{
+  display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;
+}
+.qtab{
+  flex:1;padding:10px 5px;background:none;border:none;color:#666;
+  font-size:.7rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.qtab.on{color:#a78bfa;border-bottom-color:#7b2fff;}
+#qpanel-body{
+  flex:1;overflow-y:auto;padding:14px 16px;
+  scrollbar-width:thin;scrollbar-color:rgba(123,47,255,.3) transparent;
+}
+#qpanel-body::-webkit-scrollbar{width:4px;}
+#qpanel-body::-webkit-scrollbar-thumb{background:rgba(123,47,255,.3);border-radius:2px;}
+.qcard{
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:14px;margin-bottom:12px;transition:border-color .2s;
+}
+.qcard.active{border-color:rgba(123,47,255,.5);}
+.qcard.done{border-color:rgba(74,222,128,.3);opacity:.7;}
+.qcard-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.qcard-icon{font-size:1.6rem;width:36px;text-align:center;flex-shrink:0;}
+.qcard-meta{flex:1;}
+.qcard-name{font-size:.82rem;font-weight:700;letter-spacing:1px;color:#fff;text-transform:uppercase;}
+.qcard-desc{font-size:.65rem;color:#777;margin-top:2px;line-height:1.5;}
+.qcard-status{
+  font-size:.58rem;letter-spacing:2px;padding:2px 8px;border-radius:10px;
+  text-transform:uppercase;white-space:nowrap;
+}
+.qs-active{background:rgba(123,47,255,.2);color:#a78bfa;border:1px solid rgba(123,47,255,.3);}
+.qs-done{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);}
+.qs-locked{background:rgba(255,255,255,.05);color:#555;border:1px solid rgba(255,255,255,.08);}
+.qobj{margin-bottom:5px;}
+.qobj-label{font-size:.65rem;color:#aaa;margin-bottom:3px;display:flex;justify-content:space-between;}
+.qobj-track{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+.qobj-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7b2fff,#a855f7);transition:width .4s ease;}
+.qobj-fill.done{background:linear-gradient(90deg,#22c55e,#4ade80);}
+.qreward{
+  margin-top:10px;padding:8px 10px;
+  background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);
+  border-radius:7px;font-size:.63rem;color:#fbbf24;line-height:1.7;
+}
+.qreward-title{font-size:.6rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:4px;}
+
+/* HUD quest tracker */
+#q-tracker{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.78);border:1px solid rgba(123,47,255,.3);
+  border-radius:10px;padding:9px 14px;min-width:200px;max-width:280px;
+  backdrop-filter:blur(8px);pointer-events:none;
+}
+.qt-label{font-size:.55rem;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.qt-name{font-size:.75rem;font-weight:700;color:#a78bfa;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qt-obj{font-size:.62rem;color:#aaa;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.qt-bar{flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.qt-barfill{height:100%;background:linear-gradient(90deg,#7b2fff,#a855f7);border-radius:2px;transition:width .4s;}
+
+/* Quest complete banner */
+.q-complete-banner{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:70;background:rgba(0,0,0,.95);
+  border:2px solid rgba(251,191,36,.5);
+  border-radius:14px;padding:30px 50px;
+  text-align:center;pointer-events:none;
+  animation:qcb 3.5s ease forwards;
+}
+@keyframes qcb{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
+.qcb-label{font-size:.7rem;letter-spacing:5px;color:#fbbf24;text-transform:uppercase;margin-bottom:8px;}
+.qcb-name{font-size:1.6rem;font-weight:900;letter-spacing:3px;color:#fff;margin-bottom:6px;}
+.qcb-reward{font-size:.8rem;color:#4ade80;letter-spacing:1px;}
+
+/* ── XP / LEVEL HUD ── */
+#hud-lvl{
+  position:absolute;top:12px;left:12px;
+  pointer-events:none;
+}
+/* Level badge on the TL card */
+.lvl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:6px;
+}
+.lvl-badge{
+  font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,#7b2fff,#a855f7);
+  color:#fff;border-radius:6px;padding:2px 8px;white-space:nowrap;
+}
+.xp-row{margin-bottom:7px;}
+.xp-label{display:flex;justify-content:space-between;font-size:.58rem;color:#888;margin-bottom:2px;}
+.xp-track{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;width:170px;}
+.xp-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,#f59e0b,#fbbf24);
+  transition:width .5s ease;
+}
+
+/* Level-up banner (center screen) */
+.lvlup-banner{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:200;
+  background:rgba(0,0,0,.96);
+  border:2px solid rgba(251,191,36,.6);
+  border-radius:16px;padding:36px 60px;
+  text-align:center;pointer-events:none;
+  animation:luban 3.8s ease forwards;
+}
+@keyframes luban{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+  12%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}
+  20%{transform:translate(-50%,-50%) scale(1)}
+  75%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-58%)}
+}
+.lub-glow{
+  font-size:clamp(2rem,6vw,4rem);font-weight:900;
+  letter-spacing:6px;color:#fbbf24;
+  text-shadow:0 0 40px rgba(251,191,36,.8),0 0 80px rgba(251,191,36,.4);
+  margin-bottom:4px;
+}
+.lub-num{
+  font-size:clamp(3rem,9vw,6rem);font-weight:900;
+  background:linear-gradient(135deg,#fbbf24,#f97316,#ef4444);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;margin-bottom:10px;
+}
+.lub-stat{font-size:.82rem;color:#aaa;letter-spacing:2px;margin-bottom:4px;}
+.lub-unlock{font-size:.78rem;color:#c084fc;letter-spacing:2px;margin-top:8px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;}
+
+/* Move unlock popup */
+.move-unlock-banner{
+  position:fixed;bottom:160px;left:50%;transform:translateX(-50%);
+  z-index:200;
+  background:rgba(0,0,0,.95);
+  border:1px solid rgba(168,85,247,.5);
+  border-radius:12px;padding:14px 28px;
+  text-align:center;pointer-events:none;
+  animation:mub 3s ease forwards;
+  white-space:nowrap;
+}
+@keyframes mub{0%{opacity:0;transform:translateX(-50%) translateY(20px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+.mub-label{font-size:.6rem;letter-spacing:3px;color:#888;text-transform:uppercase;margin-bottom:4px;}
+.mub-name{font-size:1rem;font-weight:700;color:#c084fc;letter-spacing:2px;}
+
+/* Quest btn on HUD */
+#qbtn{
+  position:absolute;top:12px;right:140px;
+  background:rgba(0,0,0,.78);border:1px solid rgba(123,47,255,.3);
+  border-radius:8px;padding:8px 14px;
+  font-size:.68rem;color:#a78bfa;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;pointer-events:all;transition:all .2s;backdrop-filter:blur(8px);
+}
+#qbtn:hover{border-color:#7b2fff;color:#fff;background:rgba(123,47,255,.15);}
+
+/* dpad */
+#dpad{position:fixed;bottom:80px;left:14px;z-index:25;display:none;}
+@media(max-width:700px){#dpad{display:block;}#hint{display:none;}}
+.dp-wrap{position:relative;width:130px;height:130px;}
+.dpbtn{position:absolute;width:42px;height:42px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;}
+.dpbtn:active{background:rgba(255,255,255,.25);}
+.dp-u{top:0;left:44px}.dp-d{bottom:0;left:44px}.dp-l{top:44px;left:0}.dp-r{top:44px;right:0}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-tl">
+    <div class="lvl-row">
+      <div class="hname" id="h-name">YUJI ITADORI</div>
+      <div class="lvl-badge" id="h-lvl">LV 1</div>
+    </div>
+    <div class="xp-row">
+      <div class="xp-label"><span>XP</span><span id="h-xp">0 / 100</span></div>
+      <div class="xp-track"><div class="xp-fill" id="h-xpf" style="width:0%"></div></div>
+    </div>
+    <div class="blrow">
+      <div class="bll"><span>HP</span><span id="h-hp">340/340</span></div>
+      <div class="blt"><div class="blf" id="h-hpf" style="width:100%;background:linear-gradient(90deg,#22c55e,#4ade80)"></div></div>
+    </div>
+    <div class="blrow">
+      <div class="bll"><span>⚡ CE</span><span id="h-ce">100/100</span></div>
+      <div class="blt"><div class="blf" id="h-cef" style="width:100%;background:linear-gradient(90deg,#7b2fff,#a855f7)"></div></div>
+    </div>
+    <div class="hzone" id="h-zone">📍 Jujutsu High</div>
+  </div>
+  <div id="hud-tr">
+    <div class="hlabel">EXORCISED</div>
+    <div class="hbig" id="h-kills">0</div>
+    <div style="margin-top:6px;font-size:.55rem;color:#555;letter-spacing:1px" id="h-title">Sorcerer</div>
+  </div>
+  <div id="mm-wrap">
+    <div class="mmlabel">MAP</div>
+    <canvas id="mm" width="130" height="100"></canvas>
+  </div>
+  <div id="hint">
+    <b style="color:#aaa">WASD / ↑↓←→</b> — Move<br>
+    <b style="color:#aaa">E / SPACE</b> — Interact<br>
+    <b style="color:#aaa">Q</b> — Quest Log<br>
+    <b style="color:#aaa">Walk into</b> enemies to battle
+  </div>
+  <div id="interact">Press <b>E</b> to enter portal</div>
+  <div id="notif"></div>
+  <!-- Quest tracker (center top) -->
+  <div id="q-tracker" style="display:none">
+    <div class="qt-label">⚔️ Active Quest</div>
+    <div class="qt-name" id="qt-name">—</div>
+    <div id="qt-objs"></div>
+  </div>
+  <!-- Quest log button -->
+  <button id="qbtn" onclick="G.toggleQPanel()" style="pointer-events:all">📋 Quests <span id="qbtn-badge" style="background:rgba(251,191,36,.2);color:#fbbf24;border-radius:8px;padding:1px 6px;margin-left:4px;font-size:.6rem;">0</span></button>
+</div>
+
+<!-- D-Pad -->
+<div id="dpad">
+  <div class="dp-wrap">
+    <div class="dpbtn dp-u" id="dp-u">▲</div>
+    <div class="dpbtn dp-d" id="dp-d">▼</div>
+    <div class="dpbtn dp-l" id="dp-l">◀</div>
+    <div class="dpbtn dp-r" id="dp-r">▶</div>
+  </div>
+</div>
+
+<!-- QUEST PANEL -->
+<div id="qpanel">
+  <div id="qpanel-head">
+    <div class="qp-title">📋 Quest Log</div>
+    <button class="qp-close" onclick="G.toggleQPanel()">✕ CLOSE</button>
+  </div>
+  <div id="qpanel-tabs">
+    <button class="qtab on" id="qtab-active" onclick="G.showQTab('active')">Active</button>
+    <button class="qtab" id="qtab-available" onclick="G.showQTab('available')">Available</button>
+    <button class="qtab" id="qtab-done" onclick="G.showQTab('done')">Completed</button>
+  </div>
+  <div id="qpanel-body"></div>
+</div>
+
+<!-- TITLE -->
+<div id="title">
+  <div class="ttl">CURSED WORLD</div>
+  <div class="tsub">Jujutsu Kaisen</div>
+  <div class="tdesc">Explore the open world, encounter cursed spirits, battle with techniques,<br>and unlock Domain Expansion. Exorcise all curses!</div>
+  <div class="csel-row" id="csel"></div>
+  <button class="sbtn" id="sbtn" disabled onclick="G.start()">⚔️  ENTER THE WORLD</button>
+</div>
+
+<!-- COMBAT -->
+<div id="combat">
+  <div class="cfrow">
+    <div class="cfp pl">
+      <div class="cftop">
+        <div class="cfav" id="c-pav">👊</div>
+        <div><div class="cfname" id="c-pname">YUJI</div><div class="cfgrade" id="c-pgrade">GRADE 1</div></div>
+      </div>
+      <div class="cbrow"><div class="cbll"><span>HP</span><span id="c-php">340/340</span></div><div class="cbt"><div class="cbf" id="c-phpb" style="width:100%;background:linear-gradient(90deg,#22c55e,#4ade80)"></div></div></div>
+      <div class="cbrow"><div class="cbll"><span>⚡ CE</span><span id="c-pce">100/100</span></div><div class="cbt"><div class="cbf" id="c-pceb" style="width:100%;background:linear-gradient(90deg,#7b2fff,#a855f7)"></div></div></div>
+      <div id="c-pstat" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;font-size:.58rem;"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="cfp en">
+      <div class="cftop">
+        <div class="cfav" id="c-eav">👹</div>
+        <div><div class="cfname" id="c-ename">CURSE</div><div class="cfgrade" id="c-egrade">SPECIAL GRADE</div></div>
+      </div>
+      <div class="cbrow"><div class="cbll"><span>HP</span><span id="c-ehp">300/300</span></div><div class="cbt"><div class="cbf" id="c-ehpb" style="width:100%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div></div>
+      <div class="cbrow"><div class="cbll"><span>⚡ CE</span><span id="c-ece">120/120</span></div><div class="cbt"><div class="cbf" id="c-eceb" style="width:100%;background:linear-gradient(90deg,#7b2fff,#a855f7)"></div></div></div>
+      <div id="c-estat" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;font-size:.58rem;"></div>
+    </div>
+  </div>
+  <div class="clog" id="clog"></div>
+  <div class="mgrid" id="mgrid"></div>
+  <div class="eturn" id="eturn" style="display:none;">👹 Enemy channels cursed energy…</div>
+</div>
+
+<!-- RESULT -->
+<div id="result">
+  <div class="remoji" id="r-emoji">🏆</div>
+  <div class="rtitle" id="r-title">VICTORY</div>
+  <div class="rsub" id="r-sub">Cursed spirit exorcised!</div>
+  <div id="r-xp" style="font-size:.8rem;color:#fbbf24;letter-spacing:2px;margin-bottom:16px;"></div>
+  <div class="rbtns">
+    <button class="rbtn rp" onclick="G.resumeWorld()">▶ CONTINUE</button>
+    <button class="rbtn ro" onclick="G.toTitle()">🏠 TITLE</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════
+const TS = 48; // tile size px
+const COLS = 80, ROWS = 60;
+
+const T = { GRASS:0, DIRT:1, ROAD:2, STONE:3, WATER:4, TREE:5,
+            WALL:6, BUILDING:7, FLOOR:8, DARK:9, RUIN:10,
+            PORTAL:11, SHRINE:12, SAND:13, BRIDGE:14, LAVA:15 };
+
+const PASSABLE = new Set([T.GRASS,T.DIRT,T.ROAD,T.STONE,T.FLOOR,T.DARK,T.RUIN,T.PORTAL,T.SHRINE,T.SAND,T.BRIDGE]);
+
+// Tile draw info: [fill, detail?]
+const TC = {
+  [T.GRASS]:   '#2a5216',
+  [T.DIRT]:    '#5c4a28',
+  [T.ROAD]:    '#3d3830',
+  [T.STONE]:   '#3a3a3a',
+  [T.WATER]:   '#0d3b70',
+  [T.TREE]:    '#1a3d08',
+  [T.WALL]:    '#18182a',
+  [T.BUILDING]:'#2a2050',
+  [T.FLOOR]:   '#1e1c2e',
+  [T.DARK]:    '#07070f',
+  [T.RUIN]:    '#201818',
+  [T.PORTAL]:  '#3a0070',
+  [T.SHRINE]:  '#200040',
+  [T.SAND]:    '#6e5e34',
+  [T.BRIDGE]:  '#5c4a28',
+  [T.LAVA]:    '#4a1500',
+};
+
+// ═══════════════════════════════════════════
+//  CHARACTERS
+// ═══════════════════════════════════════════
+const CHARS = [
+  {id:'yuji', name:'YUJI ITADORI', title:'Vessel of Sukuna', emoji:'👊', grade:'GRADE 1',
+   acc:'#f97316', ar:'249,115,22', spd:3.0,
+   hp:340, maxHp:340, ce:100, maxCe:100, ceRegen:15,
+   bodyColor:'#e67e22', hairColor:'#f0c27f', outlineColor:'#a04000',
+   moves:[
+    {id:'df',  name:'DIVERGENT FIST', desc:'Delayed shockwave', cost:0,  type:'atk',  pow:[38,58], crit:15, emoji:'👊'},
+    {id:'bf',  name:'BLACK FLASH',    desc:'Spatial distortion',cost:30, type:'spec', pow:[65,95], crit:40, emoji:'⚡'},
+    {id:'bst', name:'SOUL BOOST',     desc:'+ATK 2 turns',      cost:25, type:'buff', buff:{stat:'atk',val:.35,turns:2}, emoji:'🔥'},
+    {id:'dom', name:'MALEVOLENT SHRINE',desc:'Domain Expansion',cost:80, type:'domain',pow:[145,205],crit:25,emoji:'🏯'}
+  ]},
+  {id:'gojo', name:'SATORU GOJO', title:'The Strongest', emoji:'🌀', grade:'SPECIAL GRADE',
+   acc:'#38bdf8', ar:'56,189,248', spd:3.3,
+   hp:280, maxHp:280, ce:130, maxCe:130, ceRegen:20,
+   bodyColor:'#3b82f6', hairColor:'#e0e0e0', outlineColor:'#1d4ed8',
+   moves:[
+    {id:'blue', name:'BLUE',          desc:'Attraction vortex', cost:20, type:'spec', pow:[50,78], crit:20, emoji:'🔵'},
+    {id:'red',  name:'RED',           desc:'Repulsion blast',   cost:30, type:'spec', pow:[68,98], crit:20, emoji:'🔴'},
+    {id:'hol',  name:'HOLLOW PURPLE', desc:'Erasure beam',      cost:65, type:'spec', pow:[105,145],crit:30,emoji:'💜'},
+    {id:'dom',  name:'INFINITE VOID', desc:'Domain Expansion',  cost:90, type:'domain',pow:[165,225],crit:20,emoji:'∞'}
+  ]},
+  {id:'megumi', name:'MEGUMI FUSHIGURO', title:'Ten Shadows', emoji:'🐺', grade:'GRADE 1',
+   acc:'#6366f1', ar:'99,102,241', spd:2.8,
+   hp:305, maxHp:305, ce:110, maxCe:110, ceRegen:16,
+   bodyColor:'#4f46e5', hairColor:'#1a1a1a', outlineColor:'#312e81',
+   moves:[
+    {id:'dogs', name:'DIVINE DOGS',   desc:'Twin cursed dogs',  cost:20, type:'spec', pow:[48,72], crit:15, emoji:'🐕'},
+    {id:'nue',  name:'NUE DIVE',      desc:'Aerial shadow strike',cost:30,type:'spec',pow:[62,88], crit:20, emoji:'🦅'},
+    {id:'bind', name:'SHADOW BIND',   desc:'Reduce enemy DEF',  cost:40, type:'spec', pow:[55,80], crit:15, debuff:{stat:'def',val:.3,turns:2},emoji:'🌑'},
+    {id:'dom',  name:'CHIMERA SHADOW',desc:'Domain Expansion',  cost:85, type:'domain',pow:[152,205],crit:25,emoji:'🌌'}
+  ]},
+  {id:'nobara', name:'NOBARA KUGISAKI', title:'Straw Doll Technique', emoji:'🔨', grade:'GRADE 1',
+   acc:'#f472b6', ar:'244,114,182', spd:2.9,
+   hp:265, maxHp:265, ce:120, maxCe:120, ceRegen:18,
+   bodyColor:'#ec4899', hairColor:'#f0b040', outlineColor:'#9d174d',
+   moves:[
+    {id:'nail', name:'HAIRPIN',       desc:'Nail + hammer',     cost:0,  type:'atk',  pow:[32,52], crit:20, emoji:'📌'},
+    {id:'res',  name:'RESONANCE',     desc:'CE transmission',   cost:35, type:'spec', pow:[72,105],crit:25, emoji:'💠'},
+    {id:'dec',  name:'DECAY',         desc:'Cursed rot DoT',    cost:40, type:'spec', pow:[52,72], crit:10, dot:{dmg:28,turns:2},emoji:'☠️'},
+    {id:'dom',  name:'NAIL BARRAGE',  desc:'Domain Expansion',  cost:80, type:'domain',pow:[142,188],crit:30,emoji:'🔨'}
+  ]},
+];
+
+const ETYPES = [
+  {name:'FINGER BEARER',    grade:'GRADE 2',       emoji:'🤚', hp:160, ce:80,  ceRegen:14, pow:[22,42], sp:[38,65], sc:22, sn:'Curse Grasp',    dp:[95,135],  dn:'Cursed Grip',        acc:'#ef4444'},
+  {name:'TRANSFIGURED',     grade:'GRADE 1',       emoji:'😈', hp:210, ce:100, ceRegen:17, pow:[28,52], sp:[50,82], sc:28, sn:'Soul Warp',       dp:[120,165], dn:'Idle Transfiguration',acc:'#a855f7'},
+  {name:'DISASTER SPIRIT',  grade:'SPECIAL GRADE', emoji:'🌋', hp:275, ce:130, ceRegen:19, pow:[35,62], sp:[65,100],sc:35, sn:'Disaster Flames', dp:[148,200], dn:'Coffin of Iron',      acc:'#f97316'},
+  {name:'CURSED WOMB',      grade:'GRADE 1',       emoji:'🕷️',hp:195, ce:90,  ceRegen:15, pow:[26,48], sp:[44,74], sc:26, sn:'Cursed Web',      dp:[108,152], dn:'Womb Realm',          acc:'#6366f1'},
+  {name:'PLAGUE SPIRIT',    grade:'GRADE 2',       emoji:'🦠', hp:175, ce:85,  ceRegen:14, pow:[24,46], sp:[42,70], sc:24, sn:'Infection',       dp:[100,142], dn:'Plague Domain',       acc:'#22c55e'},
+  {name:'OCEAN CURSE',      grade:'SPECIAL GRADE', emoji:'🌊', hp:290, ce:140, ceRegen:20, pow:[38,65], sp:[68,105],sc:38, sn:'Tidal Barrage',   dp:[155,210], dn:'Horizon of Captivity',acc:'#06b6d4'},
+];
+
+const ZONES = [
+  {name:'Jujutsu High',    bgHint:'#0d1a0d'},
+  {name:'Shibuya',         bgHint:'#0d0d1a'},
+  {name:'Cursed Forest',   bgHint:'#0a100a'},
+  {name:'Shadow Realm',    bgHint:'#07070f'},
+  {name:'Ancient Ruins',   bgHint:'#1a0d0d'},
+  {name:'Shrine District', bgHint:'#150020'},
+];
+
+// ═══════════════════════════════════════════
+//  MAP GENERATION
+// ═══════════════════════════════════════════
+let MAP = [];
+
+function genMap() {
+  MAP = Array.from({length:ROWS}, ()=>Array(COLS).fill(T.GRASS));
+
+  // ── Jujutsu High (top-left) ──
+  rect(1,1,22,18,T.FLOOR);
+  rect(2,2,20,16,T.FLOOR);
+  // outer walls
+  rect(1,1,22,1,T.WALL); rect(1,17,22,1,T.WALL);
+  rect(1,1,1,17,T.WALL); rect(22,1,1,17,T.WALL);
+  // main building
+  rect(3,3,12,10,T.BUILDING);
+  rect(4,4,10,8,T.FLOOR);
+  // courtyard
+  rect(16,4,5,8,T.STONE);
+  rect(17,5,3,6,T.SAND);
+  // gate opening
+  MAP[17][11]=T.FLOOR; MAP[17][12]=T.FLOOR;
+
+  // ── Roads ──
+  for(let c=0;c<COLS;c++){ MAP[20][c]=T.ROAD; MAP[38][c]=T.ROAD; }
+  for(let r=0;r<ROWS;r++){ MAP[r][24]=T.ROAD; MAP[r][48]=T.ROAD; }
+  // side roads
+  for(let c=0;c<24;c++) MAP[30][c]=T.ROAD;
+  for(let r=20;r<38;r++) MAP[r][36]=T.ROAD;
+  for(let c=48;c<COLS;c++) MAP[28][c]=T.ROAD;
+
+  // ── Shibuya city (center-right) ──
+  rect(26,22,20,15,T.ROAD);
+  for(let br=22;br<37;br+=5) for(let bc=26;bc<46;bc+=5) {
+    if(br+3<37&&bc+3<46) rect(bc,br,3,3,T.BUILDING);
+  }
+  // plazas
+  rect(30,25,4,4,T.STONE);
+  rect(38,26,4,4,T.SAND);
+
+  // ── River (horizontal) ──
+  for(let c=0;c<COLS;c++) { MAP[33][c]=T.WATER; MAP[34][c]=T.WATER; MAP[35][c]=T.WATER; }
+  // Bridges
+  [12,24,36,48,60].forEach(bc=>{ MAP[33][bc]=T.BRIDGE; MAP[34][bc]=T.BRIDGE; MAP[35][bc]=T.BRIDGE; });
+
+  // ── Cursed Forest (bottom-left) ──
+  for(let r=40;r<ROWS-1;r++) for(let c=1;c<26;c++) {
+    let v=noise(c*0.15,r*0.15);
+    MAP[r][c]=v>0.3?T.TREE:(v>0?T.GRASS:T.DIRT);
+  }
+  // Forest clearings
+  rect(5,44,6,5,T.DIRT);
+  rect(14,47,5,4,T.STONE);
+
+  // ── Shadow Realm (bottom-right) ──
+  for(let r=39;r<ROWS-1;r++) for(let c=50;c<COLS-1;c++) {
+    MAP[r][c]=Math.random()<0.3?T.RUIN:T.DARK;
+  }
+  rect(55,41,6,6,T.RUIN);
+  rect(63,44,5,5,T.DARK);
+
+  // ── Ancient Ruins (top-right) ──
+  rect(52,1,26,18,T.SAND);
+  [52,60,68].forEach(c=>{[1,8,15].forEach(r=>{ rect(c,r,4,4,T.BUILDING); rect(c+1,r+1,2,2,T.RUIN); });});
+  for(let c=52;c<78;c++) MAP[10][c]=T.ROAD;
+  for(let r=1;r<18;r++) MAP[r][62]=T.ROAD;
+
+  // ── Shrine District (center) ──
+  rect(26,1,20,17,T.SAND);
+  rect(30,3,12,11,T.FLOOR);
+  rect(33,5,6,7,T.SHRINE);
+  rect(34,6,4,5,T.FLOOR);
+  for(let c=28;c<44;c++) MAP[14][c]=T.STONE;
+  for(let r=3;r<14;r++) MAP[r][36]=T.STONE;
+
+  // ── Lava area (far bottom-right) ──
+  rect(68,42,10,10,T.LAVA);
+  rect(70,44,6,6,T.RUIN);
+  [T.LAVA].forEach(()=>{}); // decor
+
+  // ── Scatter trees & stones ──
+  for(let i=0;i<200;i++){
+    let r=ri(2,ROWS-2),c=ri(2,COLS-2);
+    if(MAP[r][c]===T.GRASS) MAP[r][c]=Math.random()<0.7?T.TREE:T.STONE;
+  }
+
+  // ── Portals ──
+  PORTALS.length=0;
+  [
+    {c:11,r:18,label:'JUJUTSU HIGH GATE',zoneIdx:0},
+    {c:36,r:21,label:'SHIBUYA ENTER',zoneIdx:1},
+    {c:12,r:42,label:'CURSED FOREST',zoneIdx:2},
+    {c:56,r:40,label:'SHADOW REALM',zoneIdx:3},
+    {c:64,r:8, label:'ANCIENT RUINS',zoneIdx:4},
+    {c:35,r:3, label:'SHRINE DISTRICT',zoneIdx:5},
+  ].forEach(p=>{ MAP[p.r][p.c]=T.PORTAL; PORTALS.push(p); });
+}
+
+function rect(c,r,w,h,t){
+  for(let rr=r;rr<r+h&&rr<ROWS;rr++)
+    for(let cc=c;cc<c+w&&cc<COLS;cc++)
+      MAP[rr][cc]=t;
+}
+function noise(x,y){ return Math.sin(x*7.3+y*3.1)*0.5+Math.cos(x*2.7-y*5.9)*0.5; }
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function rf(a,b){return Math.random()*(b-a)+a;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+// ═══════════════════════════════════════════
+//  GAME OBJECT
+// ═══════════════════════════════════════════
+const G = {
+  canvas: document.getElementById('c'),
+  ctx: null,
+  mm: document.getElementById('mm'),
+  mctx: null,
+
+  // entities
+  player: null,
+  enemies: [],
+  portals: [],
+  particles: [],
+  floatTexts: [],
+
+  // state
+  keys: {},
+  tkeys: {}, // touch
+  running: false,
+  inCombat: false,
+  combat: null,
+  kills: 0,
+  zoneIdx: 0,
+  selectedChar: null,
+  raf: null,
+  notifTimer: null,
+  interactTimer: null,
+  last: 0,
+
+  init() {
+    this.ctx = this.canvas.getContext('2d');
+    this.mctx = this.mm.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', ()=>this.resize());
+    window.addEventListener('keydown', e=>{
+      this.keys[e.code]=true; this.keys[e.key]=true;
+      if(e.code==='KeyQ'&&this.running) this.toggleQPanel();
+      e.preventDefault&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE'].includes(e.code)&&e.preventDefault();
+    });
+    window.addEventListener('keyup',   e=>{ this.keys[e.code]=false; this.keys[e.key]=false; });
+    this.setupDpad();
+    this.buildCharSelect();
+  },
+
+  resize() {
+    this.canvas.width  = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  },
+
+  buildCharSelect() {
+    const el = document.getElementById('csel');
+    el.innerHTML = '';
+    CHARS.forEach(ch => {
+      const d = document.createElement('div');
+      d.className = 'ccard';
+      d.style.setProperty('--a', ch.acc);
+      d.style.setProperty('--ar', ch.ar);
+      d.innerHTML = `<span class="cemoji">${ch.emoji}</span>
+        <div class="cname">${ch.name}</div>
+        <div class="cgrade">${ch.grade} · ${ch.title}</div>
+        <div class="cstats">
+          <span class="cstat">SPD ${ch.spd.toFixed(1)}</span>
+          <span class="cstat">HP ${ch.hp}</span>
+          <span class="cstat">CE ${ch.maxCe}</span>
+          <span class="cstat">REG ${ch.ceRegen}</span>
+        </div>`;
+      d.onclick = () => { this.selectedChar = ch; document.getElementById('sbtn').disabled=false; document.querySelectorAll('.ccard').forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); };
+      el.appendChild(d);
+    });
+  },
+
+  start() {
+    if(!this.selectedChar) return;
+    document.getElementById('title').style.display = 'none';
+    genMap();
+    this.enemies = [];
+    this.kills = 0;
+    this.zoneIdx = 0;
+    this.spawnPlayer();
+    this.spawnEnemies(28);
+    QM.init();
+    this.running = true;
+    this.last = performance.now();
+    this.loop(this.last);
+    this.notify('📍 Welcome to the Cursed World! Press Q to view quests.', 3500);
+  },
+
+  spawnPlayer() {
+    const ch = this.selectedChar;
+    this.player = {
+      ...JSON.parse(JSON.stringify(ch)),
+      x: 11.5 * TS, y: 14 * TS,
+      vx: 0, vy: 0,
+      facing: 'down',
+      frame: 0, frameTick: 0,
+      moving: false,
+      buffs:[], debuffs:[], dots:[],
+      invTimer: 0,
+      stepTimer: 0,
+    };
+    LV.init(this.player);
+  },
+
+  spawnEnemies(n) {
+    for(let i=0;i<n;i++) this.trySpawnEnemy();
+  },
+
+  trySpawnEnemy() {
+    for(let t=0;t<60;t++) {
+      let r=ri(1,ROWS-2), c=ri(1,COLS-2);
+      if(!PASSABLE.has(MAP[r]?.[c])) continue;
+      let px=this.player?Math.floor(this.player.y/TS):10;
+      let py=this.player?Math.floor(this.player.x/TS):10;
+      if(Math.abs(r-px)<8&&Math.abs(c-py)<8) continue;
+      let et = ETYPES[ri(0,ETYPES.length-1)];
+      let scale = 1 + this.kills*0.04;
+      let e = {
+        ...JSON.parse(JSON.stringify(et)),
+        maxHp: Math.round(et.hp*scale), hp: Math.round(et.hp*scale),
+        maxCe: et.ce, ce: et.ce,
+        buffs:[], debuffs:[], dots:[],
+        x: (c+0.5)*TS, y: (r+0.5)*TS,
+        vx:0, vy:0,
+        moveTick:0, moveCd: ri(45,110),
+        dx:0, dy:0,
+        id: Math.random().toString(36).slice(2),
+        frame:0, frameTick:0,
+      };
+      this.enemies.push(e);
+      return;
+    }
+  },
+
+  // ── MAIN LOOP ──
+  loop(ts) {
+    if(!this.running) return;
+    this.raf = requestAnimationFrame(t=>this.loop(t));
+    const dt = Math.min((ts - this.last) / 16.67, 3); // delta, capped
+    this.last = ts;
+    if(this.inCombat) return;
+    this.update(dt);
+    this.draw();
+    this.drawMM();
+    this.updateHUD();
+  },
+
+  // ── UPDATE ──
+  update(dt) {
+    const p = this.player;
+    if(!p) return;
+
+    // ── Player movement ──
+    let dx=0, dy=0;
+    if(this.keys['ArrowUp']   ||this.keys['KeyW']||this.keys['w']||this.tkeys.up)    dy=-1;
+    if(this.keys['ArrowDown'] ||this.keys['KeyS']||this.keys['s']||this.tkeys.down)  dy= 1;
+    if(this.keys['ArrowLeft'] ||this.keys['KeyA']||this.keys['a']||this.tkeys.left)  dx=-1;
+    if(this.keys['ArrowRight']||this.keys['KeyD']||this.keys['d']||this.tkeys.right) dx= 1;
+
+    // Normalize diagonal
+    if(dx&&dy){ const l=Math.SQRT2; dx/=l; dy/=l; }
+
+    const spd = p.spd * dt;
+    p.moving = dx!==0||dy!==0;
+
+    if(p.moving) {
+      if(Math.abs(dx)>Math.abs(dy)) p.facing=dx>0?'right':'left';
+      else p.facing=dy>0?'down':'up';
+    }
+
+    // Move with collision
+    let nx = p.x + dx*spd, ny = p.y + dy*spd;
+    if(this.canWalk(nx, p.y)) p.x = nx;
+    if(this.canWalk(p.x, ny)) p.y = ny;
+    p.x = clamp(p.x, TS, (COLS-1)*TS);
+    p.y = clamp(p.y, TS, (ROWS-1)*TS);
+
+    // Animation
+    if(p.moving){ p.frameTick+=dt; if(p.frameTick>6){p.frameTick=0;p.frame=(p.frame+1)%4;} }
+    else p.frame=0;
+
+    // Invincibility
+    if(p.invTimer>0) p.invTimer-=dt;
+
+    // CE slow regen
+    p.ce = Math.min(p.maxCe, p.ce + 0.04*dt);
+
+    // Dot/buff tick handled in combat
+
+    // ── Zone detection ──
+    let col=Math.floor(p.x/TS), row=Math.floor(p.y/TS);
+    let z=0;
+    if(col>=1&&col<=22&&row>=1&&row<=17) z=0;
+    else if(col>=26&&col<=46&&row>=22&&row<=36) z=1;
+    else if(col<=25&&row>=40) z=2;
+    else if(col>=50&&row>=39) z=3;
+    else if(col>=52&&row<=18) z=4;
+    else if(col>=26&&col<=46&&row<=17) z=5;
+    if(z!==this.zoneIdx){ this.zoneIdx=z; this.notify('📍 '+ZONES[z].name); QM.onVisitZone(z); }
+
+    // Interact prompt
+    let nearPortal = this.nearestPortal(col,row);
+    document.getElementById('interact').style.opacity = nearPortal?'1':'0';
+
+    if((this.keys['KeyE']||this.keys['e']||this.keys['Space'])&&nearPortal) {
+      this.keys['KeyE']=false; this.keys['e']=false; this.keys['Space']=false;
+      this.notify('✨ Teleported to '+nearPortal.label);
+    }
+
+    // ── Enemy AI ──
+    this.enemies.forEach(e=>{
+      e.moveTick++;
+      if(e.moveTick>=e.moveCd) {
+        e.moveTick=0; e.moveCd=ri(40,100);
+        let ddx=p.x-e.x, ddy=p.y-e.y;
+        let dist=Math.sqrt(ddx*ddx+ddy*ddy);
+        if(dist<TS*10) { e.dx=ddx/dist; e.dy=ddy/dist; }
+        else { let a=Math.random()*Math.PI*2; e.dx=Math.cos(a); e.dy=Math.sin(a); }
+      }
+      let espd=1.1*dt;
+      let enx=e.x+e.dx*espd, eny=e.y+e.dy*espd;
+      if(this.canWalk(enx,e.y)) e.x=enx;
+      if(this.canWalk(e.x,eny)) e.y=eny;
+      e.x=clamp(e.x,TS,(COLS-1)*TS);
+      e.y=clamp(e.y,TS,(ROWS-1)*TS);
+
+      if(e.moving===undefined) e.moving=true;
+      e.frameTick=(e.frameTick||0)+dt;
+      if(e.frameTick>8){e.frameTick=0;e.frame=(e.frame+1)%4;}
+
+      // Encounter
+      if(!this.inCombat&&p.invTimer<=0){
+        let ddx=p.x-e.x,ddy=p.y-e.y;
+        if(Math.sqrt(ddx*ddx+ddy*ddy)<TS*1.1) this.startCombat(e);
+      }
+    });
+
+    // Particles
+    this.particles=this.particles.filter(pt=>{
+      pt.x+=pt.vx*dt; pt.y+=pt.vy*dt;
+      pt.life-=dt; pt.vy+=0.15*dt;
+      return pt.life>0;
+    });
+    this.floatTexts=this.floatTexts.filter(ft=>{
+      ft.y-=0.8*dt; ft.life-=dt; return ft.life>0;
+    });
+
+    // Spawn more enemies if needed
+    if(this.enemies.length<20) this.trySpawnEnemy();
+  },
+
+  canWalk(wx,wy) {
+    let r=Math.floor(wy/TS), c=Math.floor(wx/TS);
+    if(r<0||r>=ROWS||c<0||c>=COLS) return false;
+    return PASSABLE.has(MAP[r][c]);
+  },
+
+  nearestPortal(col,row) {
+    return PORTALS.find(p=>Math.abs(p.c-col)<=1&&Math.abs(p.r-row)<=1)||null;
+  },
+
+  // ── DRAW ──
+  draw() {
+    const cv=this.canvas, ctx=this.ctx, p=this.player;
+    if(!p) return;
+
+    // Camera centers on player
+    let camX = p.x - cv.width/2;
+    let camY = p.y - cv.height/2;
+    camX = clamp(camX, 0, COLS*TS - cv.width);
+    camY = clamp(camY, 0, ROWS*TS - cv.height);
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+
+    // Visible tile range
+    const sc=Math.floor(camX/TS)-1, ec=Math.ceil((camX+cv.width)/TS)+1;
+    const sr=Math.floor(camY/TS)-1, er=Math.ceil((camY+cv.height)/TS)+1;
+
+    // Draw tiles
+    for(let r=Math.max(0,sr);r<Math.min(ROWS,er);r++) {
+      for(let c=Math.max(0,sc);c<Math.min(COLS,ec);c++) {
+        let t=MAP[r][c];
+        let sx=c*TS-camX, sy=r*TS-camY;
+        this.drawTile(ctx,t,sx,sy,r,c);
+      }
+    }
+
+    // Draw particles behind entities
+    this.particles.forEach(pt=>{
+      ctx.globalAlpha=Math.max(0,pt.life/pt.maxLife)*0.85;
+      ctx.fillStyle=pt.color;
+      ctx.beginPath();
+      ctx.arc(pt.x-camX,pt.y-camY,pt.r*(pt.life/pt.maxLife),0,Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha=1;
+
+    // Draw enemies
+    this.enemies.forEach(e=>this.drawEnemy(ctx,e,camX,camY));
+
+    // Draw player
+    this.drawPlayer(ctx,p,camX,camY);
+
+    // Float texts
+    this.floatTexts.forEach(ft=>{
+      ctx.globalAlpha=Math.min(1,ft.life/15);
+      ctx.fillStyle=ft.color||'#fff';
+      ctx.font=`bold ${ft.size||18}px Segoe UI`;
+      ctx.textAlign='center';
+      ctx.fillText(ft.text,ft.x-camX,ft.y-camY);
+    });
+    ctx.globalAlpha=1;
+    ctx.textAlign='left';
+  },
+
+  drawTile(ctx,t,sx,sy,r,c) {
+    ctx.fillStyle=TC[t]||'#111';
+    ctx.fillRect(sx,sy,TS,TS);
+
+    // Detail overlays
+    if(t===T.WATER) {
+      let w=Math.sin(Date.now()*0.0015+r*0.4+c*0.2)*5;
+      ctx.fillStyle='rgba(30,90,200,0.25)';
+      ctx.fillRect(sx,sy+w,TS,TS/2);
+      ctx.strokeStyle='rgba(80,160,255,0.08)';
+      ctx.strokeRect(sx,sy,TS,TS);
+    }
+    else if(t===T.LAVA) {
+      let l=Math.sin(Date.now()*0.003+r+c)*6;
+      ctx.fillStyle='rgba(255,80,0,0.35)';
+      ctx.fillRect(sx,sy+l,TS,TS/2);
+    }
+    else if(t===T.TREE) {
+      // Trunk
+      ctx.fillStyle='#3d2200';
+      ctx.fillRect(sx+20,sy+30,8,18);
+      // Canopy layers
+      ctx.fillStyle='#0d3006';
+      ctx.beginPath(); ctx.arc(sx+24,sy+22,16,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#165210';
+      ctx.beginPath(); ctx.arc(sx+22,sy+16,12,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1e6b18';
+      ctx.beginPath(); ctx.arc(sx+26,sy+14,9,0,Math.PI*2); ctx.fill();
+    }
+    else if(t===T.BUILDING) {
+      ctx.fillStyle='#1c1838';
+      ctx.fillRect(sx+2,sy+2,TS-4,TS-4);
+      ctx.strokeStyle='rgba(100,80,200,0.35)';
+      ctx.lineWidth=1;
+      ctx.strokeRect(sx+2,sy+2,TS-4,TS-4);
+      // Window
+      ctx.fillStyle='rgba(120,100,220,0.25)';
+      ctx.fillRect(sx+10,sy+10,10,10);
+      ctx.fillRect(sx+28,sy+10,10,10);
+    }
+    else if(t===T.WALL) {
+      ctx.fillStyle='#0f0f1e';
+      ctx.fillRect(sx,sy,TS,TS);
+      ctx.strokeStyle='rgba(60,60,100,0.4)';
+      ctx.lineWidth=1;
+      ctx.strokeRect(sx,sy,TS,TS);
+    }
+    else if(t===T.PORTAL) {
+      let pulse=0.6+Math.sin(Date.now()*0.005)*0.35;
+      ctx.fillStyle=`rgba(100,0,220,${pulse*0.5})`;
+      ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=`rgba(180,80,255,${pulse})`;
+      ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.stroke();
+      // Rotating ring
+      ctx.save();
+      ctx.translate(sx+24,sy+24);
+      ctx.rotate(Date.now()*0.002);
+      ctx.strokeStyle=`rgba(220,120,255,${pulse*0.7})`;
+      ctx.lineWidth=1.5;
+      ctx.setLineDash([5,8]);
+      ctx.beginPath(); ctx.arc(0,0,15,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      // Label
+      let port=PORTALS.find(p=>p.c===c&&p.r===r);
+      if(port) {
+        ctx.fillStyle='rgba(200,120,255,0.85)';
+        ctx.font='bold 8px Segoe UI';
+        ctx.textAlign='center';
+        ctx.fillText(port.label,sx+24,sy+TS+10);
+        ctx.textAlign='left';
+      }
+    }
+    else if(t===T.SHRINE) {
+      ctx.fillStyle='rgba(60,0,120,0.7)';
+      ctx.fillRect(sx+4,sy+4,TS-8,TS-8);
+      ctx.font='22px serif';
+      ctx.textAlign='center';
+      ctx.fillText('⛩️',sx+24,sy+30);
+      ctx.textAlign='left';
+      let gp=0.3+Math.sin(Date.now()*0.004)*0.15;
+      ctx.fillStyle=`rgba(150,0,255,${gp})`;
+      ctx.beginPath(); ctx.arc(sx+24,sy+24,22,0,Math.PI*2); ctx.fill();
+    }
+    else if(t===T.ROAD||t===T.FLOOR||t===T.BRIDGE) {
+      ctx.strokeStyle='rgba(255,255,255,0.04)';
+      ctx.lineWidth=.5;
+      ctx.strokeRect(sx,sy,TS,TS);
+    }
+    else if(t===T.DARK) {
+      // Random cursed particles
+      if(Math.random()<0.003) this.spawnParticle((c+0.5)*TS,(r+0.5)*TS,'rgba(100,0,200,0.8)',2);
+    }
+    else if(t===T.RUIN) {
+      ctx.strokeStyle='rgba(100,50,50,0.3)';
+      ctx.lineWidth=.5;
+      ctx.strokeRect(sx+2,sy+2,TS-4,TS-4);
+      ctx.fillStyle='rgba(80,40,40,0.2)';
+      ctx.fillRect(sx+8,sy+8,TS-16,TS-16);
+    }
+    else if(t===T.GRASS) {
+      // Subtle grass texture
+      if((r+c)%3===0) {
+        ctx.fillStyle='rgba(255,255,255,0.02)';
+        ctx.fillRect(sx,sy,TS,TS);
+      }
+    }
+  },
+
+  drawPlayer(ctx,p,camX,camY) {
+    let sx=p.x-camX, sy=p.y-camY;
+    let bob=p.moving?Math.sin(Date.now()*0.018)*3:0;
+
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(sx,sy+20,16,6,0,0,Math.PI*2); ctx.fill();
+
+    // Invincibility flash
+    if(p.invTimer>0&&Math.floor(Date.now()/80)%2===0) { ctx.globalAlpha=0.35; }
+
+    // Aura glow
+    ctx.shadowBlur=22; ctx.shadowColor=p.acc;
+
+    // Character sprite (pixel-style drawn with canvas)
+    this.drawCharSprite(ctx, p, sx, sy+bob);
+
+    ctx.shadowBlur=0; ctx.globalAlpha=1;
+
+    // CE ring
+    if(p.ce>p.maxCe*0.5) {
+      let rp=0.25+Math.sin(Date.now()*0.006)*0.12;
+      ctx.strokeStyle=p.acc;
+      ctx.globalAlpha=rp;
+      ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(sx,sy,22,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+
+    // Name + level badge
+    const lv=p.level||1;
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.font='bold 9px Segoe UI';
+    ctx.textAlign='center';
+    ctx.fillText('YOU',sx,sy-26);
+    // Level pill
+    const lvTxt=`LV${lv}`;
+    const lvW=ctx.measureText(lvTxt).width+10;
+    ctx.fillStyle=lv>=15?'rgba(251,191,36,.85)':lv>=10?'rgba(168,85,247,.85)':lv>=5?'rgba(56,189,248,.85)':'rgba(123,47,255,.75)';
+    ctx.beginPath();
+    ctx.roundRect(sx-lvW/2,sy-42,lvW,13,4);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 8px Segoe UI';
+    ctx.fillText(lvTxt,sx,sy-32);
+    ctx.textAlign='left';
+  },
+
+  drawCharSprite(ctx, ent, sx, sy) {
+    const bc = ent.bodyColor||'#e67e22';
+    const hc = ent.hairColor||'#888';
+    const oc = ent.outlineColor||'#000';
+    const fr = ent.frame||0;
+    const legOff = [0,3,0,-3][fr]; // leg swing
+
+    // Legs
+    ctx.fillStyle=oc;
+    ctx.fillRect(sx-8,sy+8,7,14+legOff);
+    ctx.fillRect(sx+2,sy+8,7,14-legOff);
+    ctx.fillStyle=bc;
+    ctx.fillRect(sx-7,sy+9,5,12+legOff);
+    ctx.fillRect(sx+3,sy+9,5,12-legOff);
+
+    // Body
+    ctx.fillStyle=oc;
+    ctx.fillRect(sx-10,sy-10,20,20);
+    ctx.fillStyle=bc;
+    ctx.fillRect(sx-8,sy-8,16,16);
+
+    // Head
+    ctx.fillStyle=oc;
+    ctx.beginPath(); ctx.arc(sx,sy-18,11,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#f5cba7';
+    ctx.beginPath(); ctx.arc(sx,sy-18,9,0,Math.PI*2); ctx.fill();
+
+    // Hair
+    ctx.fillStyle=hc;
+    ctx.fillRect(sx-9,sy-28,18,10);
+    ctx.beginPath(); ctx.arc(sx,sy-26,9,Math.PI,0); ctx.fill();
+
+    // Eyes based on facing
+    ctx.fillStyle='#111';
+    if(ent.facing==='down'||!ent.facing) {
+      ctx.fillRect(sx-5,sy-21,3,3); ctx.fillRect(sx+2,sy-21,3,3);
+    } else if(ent.facing==='up') {
+      // show back of head
+      ctx.fillStyle=hc;
+      ctx.fillRect(sx-9,sy-28,18,18);
+    } else if(ent.facing==='right') {
+      ctx.fillRect(sx+3,sy-21,3,3);
+    } else {
+      ctx.fillRect(sx-6,sy-21,3,3);
+    }
+
+    // Arms
+    const armOff = ent.moving?[4,-4][fr%2]:0;
+    ctx.fillStyle=oc;
+    ctx.fillRect(sx-16,sy-10+armOff,7,16);
+    ctx.fillRect(sx+10,sy-10-armOff,7,16);
+    ctx.fillStyle=bc;
+    ctx.fillRect(sx-15,sy-9+armOff,5,14);
+    ctx.fillRect(sx+11,sy-9-armOff,5,14);
+  },
+
+  drawEnemy(ctx,e,camX,camY) {
+    let sx=e.x-camX, sy=e.y-camY;
+    // Cull off-screen
+    if(sx<-60||sx>this.canvas.width+60||sy<-60||sy>this.canvas.height+60) return;
+
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(sx,sy+18,14,5,0,0,Math.PI*2); ctx.fill();
+
+    // Aura
+    let pulse=0.3+Math.sin(Date.now()*0.004+e.id.charCodeAt(0))*0.15;
+    ctx.fillStyle=`rgba(255,50,50,${pulse*0.2})`;
+    ctx.beginPath(); ctx.arc(sx,sy,28,0,Math.PI*2); ctx.fill();
+
+    // Enemy character sprite (simpler)
+    ctx.font=`${TS-4}px serif`;
+    ctx.textAlign='center';
+    ctx.fillText(e.emoji, sx, sy+16);
+
+    // HP bar above
+    let hpPct=Math.max(0,e.hp/e.maxHp);
+    ctx.fillStyle='rgba(0,0,0,0.55)';
+    ctx.fillRect(sx-18,sy-30,36,5);
+    ctx.fillStyle=hpPct>0.5?'#22c55e':hpPct>0.25?'#f59e0b':'#ef4444';
+    ctx.fillRect(sx-18,sy-30,36*hpPct,5);
+
+    // Grade badge
+    if(e.grade==='SPECIAL GRADE') {
+      ctx.fillStyle='rgba(168,85,247,0.9)';
+      ctx.font='bold 8px Segoe UI';
+      ctx.textAlign='center';
+      ctx.fillText('⚠️ SPC',sx,sy-34);
+    }
+    ctx.textAlign='left';
+  },
+
+  drawMM() {
+    const mw=this.mm.width, mh=this.mm.height;
+    const sx=mw/COLS, sy=mh/ROWS;
+    const mc=this.mctx;
+    mc.fillStyle='#06060e';
+    mc.fillRect(0,0,mw,mh);
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
+      mc.fillStyle=TC[MAP[r][c]]||'#111';
+      mc.fillRect(c*sx,r*sy,sx+.5,sy+.5);
+    }
+    this.enemies.forEach(e=>{
+      mc.fillStyle='#ef4444';
+      mc.fillRect(e.x/TS*sx-1,e.y/TS*sy-1,3,3);
+    });
+    if(this.player) {
+      let p=this.player;
+      mc.fillStyle='#fbbf24';
+      mc.beginPath(); mc.arc(p.x/TS*sx,p.y/TS*sy,3,0,Math.PI*2); mc.fill();
+      // Viewport outline
+      let camX=clamp(p.x-this.canvas.width/2,0,COLS*TS-this.canvas.width);
+      let camY=clamp(p.y-this.canvas.height/2,0,ROWS*TS-this.canvas.height);
+      mc.strokeStyle='rgba(255,255,255,0.28)';
+      mc.lineWidth=1;
+      mc.strokeRect(camX/TS*sx,camY/TS*sy,this.canvas.width/TS*sx,this.canvas.height/TS*sy);
+    }
+  },
+
+  updateHUD() {
+    const p=this.player; if(!p) return;
+    document.getElementById('h-name').textContent=p.name;
+
+    // Level + XP
+    const lv=p.level||1;
+    const xpNow=p.xp||0;
+    const xpNext=p.xpToNext||100;
+    document.getElementById('h-lvl').textContent=`LV ${lv}`;
+    document.getElementById('h-xp').textContent=`${xpNow} / ${xpNext}`;
+    document.getElementById('h-xpf').style.width=Math.min(100,(xpNow/xpNext)*100)+'%';
+
+    // HP
+    const hpPct=p.hp/p.maxHp;
+    document.getElementById('h-hp').textContent=`${Math.max(0,Math.floor(p.hp))}/${p.maxHp}`;
+    document.getElementById('h-hpf').style.width=(hpPct*100)+'%';
+    document.getElementById('h-hpf').style.background=hpPct>0.5?'linear-gradient(90deg,#22c55e,#4ade80)':hpPct>0.25?'linear-gradient(90deg,#f59e0b,#fbbf24)':'linear-gradient(90deg,#ef4444,#f87171)';
+
+    // CE
+    document.getElementById('h-ce').textContent=`${Math.floor(p.ce)}/${p.maxCe}`;
+    document.getElementById('h-cef').style.width=(p.ce/p.maxCe*100)+'%';
+
+    document.getElementById('h-zone').textContent='📍 '+ZONES[this.zoneIdx].name;
+    document.getElementById('h-kills').textContent=this.kills;
+    document.getElementById('h-title').textContent=LV.getTitle(lv);
+  },
+
+  // ── NOTIFICATIONS ──
+  notify(msg, dur=2800) {
+    const el=document.getElementById('notif');
+    el.textContent=msg; el.style.opacity='1';
+    clearTimeout(this.notifTimer);
+    this.notifTimer=setTimeout(()=>{el.style.opacity='0';},dur);
+  },
+
+  // ── PARTICLES ──
+  spawnParticle(x,y,color,r=4,count=1) {
+    for(let i=0;i<count;i++) {
+      let a=Math.random()*Math.PI*2, spd=rf(1,3);
+      this.particles.push({x,y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd-2,
+        color,r,life:rf(15,30),maxLife:30});
+    }
+  },
+
+  floatText(x,y,text,color='#fff',size=18) {
+    this.floatTexts.push({x,y,text,color,size,life:45});
+  },
+
+  // ═══════════════════════════════════════════
+  //  COMBAT SYSTEM
+  // ═══════════════════════════════════════════
+  startCombat(enemy) {
+    this.inCombat=true;
+    this.combat={
+      player: JSON.parse(JSON.stringify(this.player)),
+      enemy:  {
+        ...JSON.parse(JSON.stringify(enemy)),
+        buffs:[], debuffs:[], dots:[],
+        maxCe:enemy.maxCe||enemy.ce,
+      },
+      pTurn:true, round:1,
+      enemy_ref: enemy, // ref to world enemy
+    };
+    this.combat.player.buffs=[...this.player.buffs];
+    this.combat.player.debuffs=[...this.player.debuffs];
+    this.combat.player.dots=[...this.player.dots];
+
+    document.getElementById('clog').innerHTML='';
+    document.getElementById('combat').classList.add('on');
+    this.renderCombat();
+    this.clog(`⚔️ Encountered <strong>${enemy.name}</strong> [${enemy.grade}]!`,'s');
+    this.clog(`⚡ Your CE: ${Math.floor(this.player.ce)}/${this.player.maxCe}`,'s');
+  },
+
+  renderCombat() {
+    const {player:p, enemy:e}=this.combat;
+    // player
+    document.getElementById('c-pav').textContent=p.emoji;
+    document.getElementById('c-pname').textContent=p.name;
+    document.getElementById('c-pgrade').textContent=p.grade;
+    this.setCombatBar('c-phpb','c-php',p.hp,p.maxHp,true);
+    this.setCombatBar('c-pceb','c-pce',p.ce,p.maxCe,false);
+    this.renderEffects('c-pstat',p.buffs,p.debuffs,p.dots);
+    // enemy
+    document.getElementById('c-eav').textContent=e.emoji;
+    document.getElementById('c-ename').textContent=e.name;
+    document.getElementById('c-egrade').textContent=e.grade;
+    this.setCombatBar('c-ehpb','c-ehp',e.hp,e.maxHp,true);
+    this.setCombatBar('c-eceb','c-ece',e.ce,e.maxCe||e.ce,false);
+    this.renderEffects('c-estat',e.buffs||[],e.debuffs||[],e.dots||[]);
+    this.renderMoves();
+  },
+
+  setCombatBar(fillId,textId,val,max,isHp) {
+    let pct=Math.max(0,Math.min(100,(val/max)*100));
+    let el=document.getElementById(fillId);
+    el.style.width=pct+'%';
+    if(isHp) el.style.background=pct>50?'linear-gradient(90deg,#22c55e,#4ade80)':pct>25?'linear-gradient(90deg,#f59e0b,#fbbf24)':'linear-gradient(90deg,#ef4444,#f87171)';
+    else el.style.background='linear-gradient(90deg,#7b2fff,#a855f7)';
+    document.getElementById(textId).textContent=`${Math.max(0,Math.floor(val))}/${Math.floor(max)}`;
+  },
+
+  renderEffects(id,buffs,debuffs,dots) {
+    document.getElementById(id).innerHTML=[
+      ...(buffs||[]).map(b=>`<span style="background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);padding:1px 5px;border-radius:7px;">↑${b.stat.toUpperCase()} (${b.turns}t)</span>`),
+      ...(debuffs||[]).map(d=>`<span style="background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);padding:1px 5px;border-radius:7px;">↓${d.stat.toUpperCase()} (${d.turns}t)</span>`),
+      ...(dots||[]).map(d=>`<span style="background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);padding:1px 5px;border-radius:7px;">☠️(${d.turns}t)</span>`)
+    ].join('');
+  },
+
+  renderMoves() {
+    const grid=document.getElementById('mgrid'); grid.innerHTML='';
+    const p=this.combat.player;
+    p.moves.forEach(mv=>{
+      const btn=document.createElement('button');
+      btn.className='mbtn';
+      const tmap={atk:'ta',spec:'ts',buff:'tb',domain:'td'};
+      const tlbl={atk:'ATK',spec:'TECH',buff:'BUFF',domain:'DOMAIN'};
+      btn.style.setProperty('--mc',mv.type==='domain'?'#fbbf24':p.acc||'#7b2fff');
+      btn.style.setProperty('--mr',mv.type==='domain'?'251,191,36':p.ar||'123,47,255');
+      const disc=(mv.type==='domain'&&p.domainDiscount)?p.domainDiscount:0;
+      const dispCost=Math.max(0,mv.cost-disc);
+      btn.disabled=!this.combat.pTurn||p.ce<dispCost;
+      btn.innerHTML=`<span class="mt ${tmap[mv.type]||'ta'}">${tlbl[mv.type]||'ATK'}</span><span class="mn">${mv.emoji} ${mv.name}</span><span class="mc">⚡${dispCost}${disc?` <span style="color:#4ade80;font-size:.55rem">−${disc}</span>`:''}CE</span>`;
+      btn.onclick=()=>this.playerCombatMove(mv);
+      grid.appendChild(btn);
+    });
+  },
+
+  clog(msg,type='') {
+    const log=document.getElementById('clog');
+    const d=document.createElement('div');
+    d.className=`cl cl-${type}`;
+    d.innerHTML=msg;
+    log.appendChild(d);
+    log.scrollTop=log.scrollHeight;
+  },
+
+  playerCombatMove(mv) {
+    if(!this.combat.pTurn) return;
+    const {player:p,enemy:e}=this.combat;
+    const realCost = mv.type==='domain' ? Math.max(0, mv.cost-(p.domainDiscount||0)) : mv.cost;
+    if(p.ce<realCost){ this.clog('⚡ Not enough CE!','s'); return; }
+    p.ce-=realCost;
+    this.combat.pTurn=false;
+    this.setMovesBtns(false);
+    const crit=Math.random()*100<(mv.crit||0);
+
+    if(mv.type==='domain') {
+      QM.onDomainUse();
+      this.showDomainFlash(p.name,mv.name,mv.emoji,()=>{
+        const dmg=this.calcDmg(mv.pow,p,e,crit);
+        e.hp=Math.max(0,e.hp-dmg);
+        this.clog(`🏯 <strong>DOMAIN EXPANSION: ${mv.name}!</strong>`,'d');
+        this.clog(`${p.emoji} dealt <strong>${dmg}</strong> DMG!${crit?' ⚡ DIRECT HIT!':''}`,'p');
+        this.dmgPop(dmg,'#f87171',crit);
+        this.renderCombat();
+        if(!this.checkCombatEnd()) setTimeout(()=>this.enemyCombatTurn(),1100);
+      });
+    } else if(mv.type==='buff') {
+      p.buffs.push({stat:mv.buff.stat,val:mv.buff.val,turns:mv.buff.turns});
+      this.clog(`🔥 ${p.emoji} <strong>${mv.name}</strong> — ${mv.buff.stat.toUpperCase()} boosted!`,'p');
+      this.renderCombat();
+      setTimeout(()=>this.enemyCombatTurn(),900);
+    } else {
+      const dmg=this.calcDmg(mv.pow,p,e,crit);
+      e.hp=Math.max(0,e.hp-dmg);
+      if(mv.debuff){ e.debuffs=e.debuffs||[]; e.debuffs.push({...mv.debuff}); }
+      if(mv.dot){ e.dots=e.dots||[]; e.dots.push({dmg:mv.dot.dmg,turns:mv.dot.turns}); }
+      this.clog(`${mv.emoji} ${p.emoji} <strong>${mv.name}</strong> → ${dmg} DMG${crit?' <span style="color:#ff9500">⚡ CRIT!</span>':''}`,'p');
+      this.dmgPop(dmg,'#f87171',crit);
+      this.renderCombat();
+      if(!this.checkCombatEnd()) setTimeout(()=>this.enemyCombatTurn(),1000);
+    }
+  },
+
+  enemyCombatTurn() {
+    if(!this.combat) return;
+    const {player:p,enemy:e}=this.combat;
+    document.getElementById('eturn').style.display='block';
+    setTimeout(()=>{
+      document.getElementById('eturn').style.display='none';
+
+      // Tick enemy DoTs/effects
+      (e.dots||[]).forEach(d=>{ e.hp=Math.max(0,e.hp-d.dmg); this.clog(`☠️ ${e.name} takes ${d.dmg} curse rot!`,'s'); d.turns--; });
+      e.dots=(e.dots||[]).filter(d=>d.turns>0);
+      e.buffs=(e.buffs||[]).map(b=>({...b,turns:b.turns-1})).filter(b=>b.turns>0);
+      e.debuffs=(e.debuffs||[]).map(d=>({...d,turns:d.turns-1})).filter(d=>d.turns>0);
+
+      if(e.hp<=0){ this.checkCombatEnd(); return; }
+
+      const hpPct=e.hp/e.maxHp;
+      const roll=Math.random();
+      const crit=Math.random()<0.14;
+      let dmg;
+
+      if(e.ce>=60&&hpPct<0.3&&roll<0.4) {
+        // Domain
+        e.ce=Math.max(0,e.ce-60);
+        dmg=ri(e.dp[0],e.dp[1]);
+        this.showDomainFlash(e.name,e.dn,'🌑',()=>{
+          p.hp=Math.max(0,p.hp-dmg);
+          this.clog(`💀 <strong>ENEMY DOMAIN: ${e.dn}!</strong>`,'d');
+          this.clog(`${e.emoji} deals <strong>${dmg}</strong> DMG!`,'e');
+          this.dmgPop(dmg,'#ef4444');
+          this.renderCombat();
+          if(!this.checkCombatEnd()) this.nextPlayerTurn();
+        });
+      } else if(e.ce>=(e.sc||25)&&roll<0.38) {
+        e.ce=Math.max(0,e.ce-(e.sc||25));
+        dmg=ri(e.sp[0],e.sp[1]);
+        if(crit) dmg=Math.floor(dmg*1.5);
+        p.hp=Math.max(0,p.hp-dmg);
+        this.clog(`⚡ ${e.emoji} <strong>${e.sn}</strong> → ${dmg} DMG${crit?' CRIT!':''}`,'e');
+        this.dmgPop(dmg,'#ef4444',crit);
+        e.ce=Math.min(e.maxCe||e.ce,e.ce+(e.ceRegen||14));
+        this.renderCombat();
+        if(!this.checkCombatEnd()) this.nextPlayerTurn();
+      } else {
+        dmg=ri(e.pow[0],e.pow[1]);
+        if(crit) dmg=Math.floor(dmg*1.4);
+        p.hp=Math.max(0,p.hp-dmg);
+        this.clog(`👹 ${e.emoji} <strong>attacks</strong> → ${dmg} DMG${crit?' CRIT!':''}`,'e');
+        this.dmgPop(dmg,'#ef4444');
+        e.ce=Math.min(e.maxCe||e.ce,e.ce+(e.ceRegen||14));
+        this.renderCombat();
+        if(!this.checkCombatEnd()) this.nextPlayerTurn();
+      }
+    },1400);
+  },
+
+  nextPlayerTurn() {
+    const {player:p}=this.combat;
+    // Tick player DoTs
+    (p.dots||[]).forEach(d=>{ p.hp=Math.max(0,p.hp-d.dmg); this.clog(`☠️ You take ${d.dmg} curse rot!`,'e'); d.turns--; });
+    p.dots=(p.dots||[]).filter(d=>d.turns>0);
+    p.buffs=(p.buffs||[]).map(b=>({...b,turns:b.turns-1})).filter(b=>b.turns>0);
+    p.debuffs=(p.debuffs||[]).map(d=>({...d,turns:d.turns-1})).filter(d=>d.turns>0);
+    // CE regen
+    p.ce=Math.min(p.maxCe,p.ce+p.ceRegen);
+    if(!this.checkCombatEnd()){
+      this.combat.pTurn=true; this.combat.round++;
+      this.renderCombat(); this.setMovesBtns(true);
+    }
+  },
+
+  checkCombatEnd() {
+    const {player:p,enemy:e}=this.combat;
+    if(e.hp<=0){
+      this.kills++;
+      // Award XP
+      const xpResult = LV.awardXp(this.player, e);
+      this.combat._xpGained = xpResult.gained;
+      this.combat._levelsGained = xpResult.levelsGained;
+      // Sync level-up stat changes back into combat player copy
+      this.combat.player.maxHp  = this.player.maxHp;
+      this.combat.player.maxCe  = this.player.maxCe;
+      this.combat.player.ceRegen= this.player.ceRegen;
+      this.combat.player.spd    = this.player.spd;
+      this.combat.player.moves  = this.player.moves;
+      QM.onKill(e);
+      QM.onBattleWin(p.hp, p.maxHp);
+      this.clog(`🏆 <strong>${e.name} exorcised!</strong> (+${xpResult.gained} XP)`,'s');
+      if(xpResult.levelsGained.length) this.clog(`✨ LEVEL UP! Now LV ${this.player.level}!`,'h');
+      setTimeout(()=>this.showResult(true),600);
+      return true;
+    }
+    if(p.hp<=0){
+      this.clog(`💀 You were overwhelmed by ${e.name}...`,'s');
+      setTimeout(()=>this.showResult(false),600);
+      return true;
+    }
+    return false;
+  },
+
+  showResult(won) {
+    document.getElementById('combat').classList.remove('on');
+    document.getElementById('r-emoji').textContent=won?'🏆':'💀';
+    const rt=document.getElementById('r-title');
+    rt.textContent=won?'VICTORY':'DEFEAT';
+    rt.className='rtitle '+(won?'rwin':'rlose');
+    document.getElementById('r-sub').textContent=won
+      ?`${this.combat.enemy.name} has been exorcised! (${this.kills} total)`
+      :`You were defeated by ${this.combat.enemy.name}…`;
+    document.getElementById('result').classList.add('on');
+
+    if(won){
+      // Sync player HP/CE back
+      this.player.hp=this.combat.player.hp;
+      this.player.ce=Math.min(this.player.maxCe,this.combat.player.ce+15);
+      this.player.buffs=this.combat.player.buffs;
+      this.player.debuffs=this.combat.player.debuffs;
+      this.player.dots=this.combat.player.dots;
+      // Remove world enemy
+      this.enemies=this.enemies.filter(e=>e!==this.combat.enemy_ref);
+      // XP float text
+      const xg=this.combat._xpGained||0;
+      const lvs=this.combat._levelsGained||[];
+      this.floatText(this.player.x,this.player.y-40,'+'+xg+' XP','#fbbf24',16);
+      // Result screen XP line
+      const lv=this.player.level;
+      const xpPct=Math.floor((this.player.xp/this.player.xpToNext)*100);
+      let xpLine=`+${xg} XP  •  LV ${lv} — ${LV.getTitle(lv)}`;
+      if(lvs.length) xpLine=`✨ LEVEL UP → LV ${lv}!  +${xg} XP`;
+      document.getElementById('r-xp').textContent=xpLine;
+    } else {
+      document.getElementById('r-xp').textContent='';
+    }
+  },
+
+  resumeWorld() {
+    document.getElementById('result').classList.remove('on');
+    this.inCombat=false;
+    if(this.player.hp<=0){
+      this.player.hp=Math.floor(this.player.maxHp*0.5);
+      this.player.x=11.5*TS; this.player.y=14*TS;
+      this.notify('⚠️ Respawned at Jujutsu High');
+    }
+    this.player.invTimer=200;
+    this.combat=null;
+    this.last=performance.now();
+    this.loop(this.last);
+  },
+
+  toTitle() {
+    document.getElementById('result').classList.remove('on');
+    document.getElementById('combat').classList.remove('on');
+    this.inCombat=false; this.running=false;
+    if(this.raf){cancelAnimationFrame(this.raf);this.raf=null;}
+    this.kills=0; this.zoneIdx=0;
+    this.selectedChar=null;
+    document.getElementById('sbtn').disabled=true;
+    document.getElementById('qpanel').classList.remove('open');
+    document.getElementById('q-tracker').style.display='none';
+    document.querySelectorAll('.ccard').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('title').style.display='flex';
+  },
+
+  // ── Helpers ──
+  calcDmg(pow,atk,def,crit=false){
+    let dmg=ri(pow[0],pow[1]);
+    const atkBuff=(atk.buffs||[]).find(b=>b.stat==='atk');
+    if(atkBuff) dmg=Math.floor(dmg*(1+atkBuff.val));
+    const defDeb=(def.debuffs||[]).find(d=>d.stat==='def');
+    if(!defDeb) dmg=Math.floor(dmg*.9);
+    else dmg=Math.floor(dmg*(1+defDeb.val));
+    if(crit) dmg=Math.floor(dmg*1.6);
+    return Math.max(1,dmg);
+  },
+
+  dmgPop(amount,color='#f87171',crit=false){
+    const el=document.createElement('div');
+    el.className='dpop';
+    el.style.color=crit?'#ff9500':color;
+    el.style.left=(window.innerWidth/2+ri(-80,80))+'px';
+    el.style.top=(window.innerHeight/2-50)+'px';
+    el.textContent=(crit?'💥 ':'')+amount;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1200);
+  },
+
+  showDomainFlash(name,dname,emoji,cb){
+    const el=document.createElement('div');
+    el.className='dflash';
+    el.innerHTML=`<div class="dt">⚠️ DOMAIN EXPANSION ⚠️</div><div class="dn">${emoji} ${dname}</div><div style="margin-top:12px;color:#777;font-size:.8rem;letter-spacing:3px">${name}</div>`;
+    document.body.appendChild(el);
+    setTimeout(()=>{el.remove();cb();},3000);
+  },
+
+  setMovesBtns(en){
+    document.querySelectorAll('.mbtn').forEach(b=>{
+      if(!en){b.disabled=true;return;}
+    });
+    this.renderMoves();
+  },
+
+  // ── QUEST PANEL ──
+  toggleQPanel(){
+    const panel=document.getElementById('qpanel');
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open')) QM.refreshUI();
+  },
+
+  showQTab(tab){
+    QM.activeTab=tab;
+    ['active','available','done'].forEach(t=>{
+      document.getElementById('qtab-'+t).classList.toggle('on',t===tab);
+    });
+    QM.refreshUI();
+  },
+
+  // D-pad setup
+  setupDpad(){
+    const pairs=[['dp-u','up'],['dp-d','down'],['dp-l','left'],['dp-r','right']];
+    pairs.forEach(([id,dir])=>{
+      const el=document.getElementById(id);
+      el.addEventListener('touchstart',e=>{this.tkeys[dir]=true;e.preventDefault();},{passive:false});
+      el.addEventListener('touchend',  e=>{this.tkeys[dir]=false;e.preventDefault();},{passive:false});
+      el.addEventListener('mousedown', ()=>this.tkeys[dir]=true);
+      el.addEventListener('mouseup',   ()=>this.tkeys[dir]=false);
+      el.addEventListener('mouseleave',()=>this.tkeys[dir]=false);
+    });
+  },
+};
+
+// ═══════════════════════════════════════════
+//  XP & LEVEL SYSTEM
+// ═══════════════════════════════════════════
+
+// XP needed to reach each level (index = level, value = total XP needed)
+// Level 1 = 0 XP baseline, Level 2 = 100 XP, etc.
+function xpForLevel(lvl) {
+  // Exponential curve: each level needs ~40% more than previous
+  if(lvl<=1) return 0;
+  return Math.floor(100 * Math.pow(1.4, lvl-2));
+}
+function totalXpForLevel(lvl) {
+  let total=0;
+  for(let i=2;i<=lvl;i++) total+=xpForLevel(i);
+  return total;
+}
+
+// XP rewards by enemy grade
+const XP_BY_GRADE = {
+  'GRADE 2':        40,
+  'GRADE 1':        80,
+  'SPECIAL GRADE': 160,
+};
+
+// Stat gains per level-up
+const LEVEL_STAT_GAINS = {
+  hp:     [0, 0, 10, 15, 10, 20, 10, 15, 25, 10, 30],  // indexed by new level (1-10+)
+  ce:     [0, 0,  5,  8,  5, 10,  5,  8, 12,  5, 15],
+  ceReg:  [0, 0,  1,  0,  1,  1,  0,  2,  1,  1,  2],
+  spd:    [0, 0,  0,  0,.1,  0,.1,  0,  0, .1,  0],
+};
+
+// Sorcerer titles by level
+const LEVEL_TITLES = [
+  '',                    // lv 0
+  'Student',            // lv 1
+  'Student',            // lv 2
+  'Grade 4 Sorcerer',   // lv 3
+  'Grade 4 Sorcerer',   // lv 4
+  'Grade 3 Sorcerer',   // lv 5
+  'Grade 3 Sorcerer',   // lv 6
+  'Grade 2 Sorcerer',   // lv 7
+  'Grade 2 Sorcerer',   // lv 8
+  'Grade 1 Sorcerer',   // lv 9
+  'Grade 1 Sorcerer',   // lv 10
+  'Semi-Special Grade', // lv 11
+  'Semi-Special Grade', // lv 12
+  'Special Grade',      // lv 13
+  'Special Grade',      // lv 14
+  'THE STRONGEST',      // lv 15+
+];
+
+// Moves unlocked at certain levels (per character)
+// keyed by char id, value = array of {level, move}
+const LEVEL_MOVES = {
+  yuji: [
+    { level:5,  move:{ id:'sm', name:'SUPERNOVA',      desc:'Explosive CE burst',    cost:45, type:'spec', pow:[85,120], crit:25, emoji:'💥' }},
+    { level:10, move:{ id:'sk', name:'SUKUNA SLASH',   desc:'Borrowed power strike', cost:60, type:'spec', pow:[110,155],crit:35, emoji:'⚔️' }},
+    { level:15, move:{ id:'ds', name:'DISMANTLE',      desc:'Sukuna\'s ultimate cut', cost:70, type:'spec', pow:[140,185],crit:40, emoji:'🔪' }},
+  ],
+  gojo: [
+    { level:5,  move:{ id:'lim', name:'LIMITLESS',      desc:'Infinite boundary',     cost:50, type:'spec', pow:[90,125], crit:20, emoji:'♾️' }},
+    { level:10, move:{ id:'six', name:'SIX EYES BLAST', desc:'True Limitless strike',  cost:65, type:'spec', pow:[115,160],crit:25, emoji:'👁️' }},
+    { level:15, move:{ id:'col', name:'COMPLETE HOLLOW',desc:'Perfect Purple technique',cost:75,type:'spec',pow:[145,195],crit:30,emoji:'✨' }},
+  ],
+  megumi: [
+    { level:5,  move:{ id:'max', name:'MAHORAGA',       desc:'Eight-Handled Wheel',   cost:50, type:'spec', pow:[88,125], crit:20, emoji:'☸️' }},
+    { level:10, move:{ id:'gen', name:'GENERAL SHADOW', desc:'All ten shadows at once', cost:65,type:'spec', pow:[112,155],crit:25, emoji:'🌑' }},
+    { level:15, move:{ id:'pfo', name:'PERFECT FORM',   desc:'Shadows at full power',  cost:75,type:'spec', pow:[140,188],crit:30, emoji:'🌌' }},
+  ],
+  nobara: [
+    { level:5,  move:{ id:'bp',  name:'BLOOD PACT',     desc:'Drains enemy CE',       cost:45, type:'spec', pow:[82,118], crit:25, emoji:'🩸' }},
+    { level:10, move:{ id:'nst', name:'NAIL STORM',     desc:'Rapid-fire nail barrage',cost:60,type:'spec', pow:[108,150],crit:30, emoji:'📍' }},
+    { level:15, move:{ id:'rge', name:'CURSED RAGE',    desc:'Berserk straw doll',    cost:72, type:'spec', pow:[138,182],crit:35, emoji:'🔥' }},
+  ],
+};
+
+const LV = {
+  // Called once per game start
+  init(player) {
+    player.xp    = 0;
+    player.level = 1;
+    player.totalXp = 0;
+    player.xpToNext = xpForLevel(2);
+  },
+
+  // Award XP for killing an enemy, return {xpGained, levelsGained[]}
+  awardXp(player, enemy) {
+    const base = XP_BY_GRADE[enemy.grade] || 40;
+    // Bonus for fighting higher-level enemies
+    const bonus = Math.max(0, (enemy.maxHp - player.maxHp) / 20);
+    const gained = Math.floor(base + bonus);
+    player.xp       += gained;
+    player.totalXp  += gained;
+    const levelsGained = [];
+    while(player.xp >= player.xpToNext) {
+      player.xp -= player.xpToNext;
+      player.level++;
+      player.xpToNext = xpForLevel(player.level + 1);
+      this._applyLevelUp(player, player.level);
+      levelsGained.push(player.level);
+    }
+    return { gained, levelsGained };
+  },
+
+  _applyLevelUp(player, newLevel) {
+    const idx = Math.min(newLevel, LEVEL_STAT_GAINS.hp.length-1);
+    const hpGain  = LEVEL_STAT_GAINS.hp[idx]   || 10;
+    const ceGain  = LEVEL_STAT_GAINS.ce[idx]   || 5;
+    const regGain = LEVEL_STAT_GAINS.ceReg[idx] || 0;
+    const spdGain = LEVEL_STAT_GAINS.spd[idx]  || 0;
+    player.maxHp += hpGain;
+    player.hp = Math.min(player.hp + Math.floor(hpGain/2), player.maxHp); // partial heal on level up
+    player.maxCe += ceGain;
+    player.ce = Math.min(player.ce + ceGain, player.maxCe);
+    player.ceRegen += regGain;
+    player.spd += spdGain;
+
+    // Check for unlocked moves
+    const charMoves = LEVEL_MOVES[player.id] || [];
+    charMoves.forEach(entry => {
+      if(entry.level === newLevel) {
+        // Don't add duplicates
+        if(!player.moves.some(m=>m.id===entry.move.id)) {
+          player.moves.push({...entry.move});
+          this._showMoveUnlock(entry.move);
+        }
+      }
+    });
+
+    // Show level-up banner
+    this._showLevelUpBanner(player, newLevel, hpGain, ceGain, regGain, spdGain);
+  },
+
+  _showLevelUpBanner(player, level, hp, ce, reg, spd) {
+    const el = document.createElement('div');
+    el.className = 'lvlup-banner';
+    const title = LEVEL_TITLES[Math.min(level, LEVEL_TITLES.length-1)];
+    const statLines = [
+      hp   ? `+${hp} Max HP`          : '',
+      ce   ? `+${ce} Max CE`          : '',
+      reg  ? `+${reg} CE Regen/turn`  : '',
+      spd  ? `+${spd.toFixed(1)} Speed` : '',
+    ].filter(Boolean).join('  •  ');
+    const hasMoveUnlock = (LEVEL_MOVES[player.id]||[]).some(e=>e.level===level);
+    el.innerHTML = `
+      <div class="lub-glow">✨ LEVEL UP ✨</div>
+      <div class="lub-num">LV ${level}</div>
+      <div class="lub-stat">${statLines}</div>
+      ${title?`<div style="font-size:.72rem;color:#fbbf24;letter-spacing:3px;margin-top:6px;text-transform:uppercase">${title}</div>`:''}
+      ${hasMoveUnlock?`<div class="lub-unlock">🔓 New Technique Unlocked!</div>`:''}
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+
+    // Spawn celebration particles on the player
+    const p = G.player;
+    if(p) {
+      for(let i=0;i<30;i++) {
+        const a=Math.random()*Math.PI*2, r=rf(2,6);
+        const colors=['#fbbf24','#f97316','#a855f7','#38bdf8','#4ade80'];
+        G.spawnParticle(p.x,p.y,colors[Math.floor(Math.random()*colors.length)],r,1);
+      }
+    }
+  },
+
+  _showMoveUnlock(move) {
+    const el = document.createElement('div');
+    el.className = 'move-unlock-banner';
+    el.innerHTML = `<div class="mub-label">🔓 New Technique Unlocked</div><div class="mub-name">${move.emoji} ${move.name}</div>`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 3200);
+  },
+
+  getTitle(level) {
+    return LEVEL_TITLES[Math.min(level, LEVEL_TITLES.length-1)] || '';
+  },
+};
+
+// ═══════════════════════════════════════════
+//  QUEST DEFINITIONS
+// ═══════════════════════════════════════════
+const QUEST_DEFS = [
+  {
+    id:'q_first_blood',
+    name:'First Blood',
+    icon:'🩸',
+    desc:'Exorcise your first cursed spirit to prove yourself as a sorcerer.',
+    prereq:[],
+    objectives:[
+      {id:'kill_any', label:'Exorcise a Cursed Spirit', type:'kill_any', need:1, cur:0}
+    ],
+    reward:{ hp:30, desc:'+30 Max HP, Full Heal' },
+    applyReward(p){ p.maxHp+=30; p.hp=p.maxHp; }
+  },
+  {
+    id:'q_initiation',
+    name:'Cursed Initiation',
+    icon:'⚡',
+    desc:'Prove your worth by defeating five cursed spirits in combat.',
+    prereq:['q_first_blood'],
+    objectives:[
+      {id:'kill_5', label:'Exorcise Cursed Spirits (5)', type:'kill_any', need:5, cur:0}
+    ],
+    reward:{ ce:20, desc:'+20 Max CE, +2 CE Regen' },
+    applyReward(p){ p.maxCe+=20; p.ce=p.maxCe; p.ceRegen+=2; }
+  },
+  {
+    id:'q_explorer',
+    name:'World Explorer',
+    icon:'🗺️',
+    desc:'Venture into all six cursed zones across the open world.',
+    prereq:[],
+    objectives:[
+      {id:'zone_0', label:'Visit Jujutsu High',    type:'visit_zone', zoneIdx:0, need:1, cur:0},
+      {id:'zone_1', label:'Visit Shibuya',         type:'visit_zone', zoneIdx:1, need:1, cur:0},
+      {id:'zone_2', label:'Visit Cursed Forest',   type:'visit_zone', zoneIdx:2, need:1, cur:0},
+      {id:'zone_3', label:'Visit Shadow Realm',    type:'visit_zone', zoneIdx:3, need:1, cur:0},
+      {id:'zone_4', label:'Visit Ancient Ruins',   type:'visit_zone', zoneIdx:4, need:1, cur:0},
+      {id:'zone_5', label:'Visit Shrine District', type:'visit_zone', zoneIdx:5, need:1, cur:0},
+    ],
+    reward:{ hp:40, spd:0.2, desc:'+40 Max HP, +0.2 Speed' },
+    applyReward(p){ p.maxHp+=40; p.hp=Math.min(p.hp+40,p.maxHp); p.spd+=0.2; }
+  },
+  {
+    id:'q_grade1',
+    name:'Grade 1 Sorcerer',
+    icon:'🏅',
+    desc:'Defeat 10 cursed spirits to earn your Grade 1 certification.',
+    prereq:['q_initiation'],
+    objectives:[
+      {id:'kill_10', label:'Exorcise Cursed Spirits (10)', type:'kill_any', need:10, cur:0}
+    ],
+    reward:{ hp:25, ce:25, desc:'+25 Max HP, +25 Max CE, Title: Grade 1' },
+    applyReward(p){ p.maxHp+=25; p.maxCe+=25; p.hp=Math.min(p.hp+25,p.maxHp); p.ce=Math.min(p.ce+25,p.maxCe); }
+  },
+  {
+    id:'q_shadow_hunter',
+    name:'Shadow Hunter',
+    icon:'🌑',
+    desc:'Prove your strength by defeating three Special Grade cursed spirits.',
+    prereq:['q_grade1'],
+    objectives:[
+      {id:'kill_sg', label:'Defeat Special Grade Curses (3)', type:'kill_grade', grade:'SPECIAL GRADE', need:3, cur:0}
+    ],
+    reward:{ hp:60, ce:30, desc:'+60 Max HP, +30 Max CE' },
+    applyReward(p){ p.maxHp+=60; p.maxCe+=30; p.hp=Math.min(p.hp+60,p.maxHp); p.ce=Math.min(p.ce+30,p.maxCe); }
+  },
+  {
+    id:'q_domain_user',
+    name:'Domain Practitioner',
+    icon:'🏯',
+    desc:'Unleash Domain Expansion in 3 battles to master the technique.',
+    prereq:['q_grade1'],
+    objectives:[
+      {id:'domain_3', label:'Use Domain Expansion (3)', type:'use_domain', need:3, cur:0}
+    ],
+    reward:{ domDiscount:15, desc:'Domain Expansion costs -15 CE, +40 Max CE' },
+    applyReward(p){ p.maxCe+=40; p.ce=Math.min(p.ce+40,p.maxCe); p.domainDiscount=(p.domainDiscount||0)+15; }
+  },
+  {
+    id:'q_curse_breaker',
+    name:'Curse Breaker',
+    icon:'💥',
+    desc:'Exorcise 25 cursed spirits and become a feared sorcerer.',
+    prereq:['q_shadow_hunter'],
+    objectives:[
+      {id:'kill_25', label:'Exorcise Cursed Spirits (25)', type:'kill_any', need:25, cur:0}
+    ],
+    reward:{ hp:80, ceRegen:5, desc:'+80 Max HP, +5 CE Regen/turn, Title: Semi-Grade 1' },
+    applyReward(p){ p.maxHp+=80; p.hp=Math.min(p.hp+80,p.maxHp); p.ceRegen+=5; }
+  },
+  {
+    id:'q_fearless',
+    name:'Fearless Fighter',
+    icon:'🔥',
+    desc:'Win a battle without your HP dropping below 50%.',
+    prereq:['q_first_blood'],
+    objectives:[
+      {id:'clean_win', label:'Win with HP above 50%', type:'clean_win', need:1, cur:0}
+    ],
+    reward:{ ce:15, ceRegen:3, desc:'+15 Max CE, +3 CE Regen, "Cursed Technique" title' },
+    applyReward(p){ p.maxCe+=15; p.ceRegen+=3; p.ce=Math.min(p.ce+15,p.maxCe); }
+  },
+  {
+    id:'q_the_strongest',
+    name:'The Strongest',
+    icon:'✨',
+    desc:'Exorcise 50 cursed spirits and ascend to Special Grade.',
+    prereq:['q_curse_breaker'],
+    objectives:[
+      {id:'kill_50', label:'Exorcise Cursed Spirits (50)', type:'kill_any', need:50, cur:0}
+    ],
+    reward:{ hp:100, ce:50, ceRegen:8, desc:'+100 Max HP, +50 Max CE, +8 CE Regen, Title: SPECIAL GRADE' },
+    applyReward(p){ p.maxHp+=100; p.maxCe+=50; p.ceRegen+=8; p.hp=Math.min(p.hp+100,p.maxHp); p.ce=Math.min(p.ce+50,p.maxCe); }
+  },
+];
+
+// ═══════════════════════════════════════════
+//  QUEST MANAGER
+// ═══════════════════════════════════════════
+const QM = {
+  quests: {},   // id -> {def, status:'locked'|'available'|'active'|'done'}
+  activeTab: 'active',
+
+  init(){
+    this.quests={};
+    QUEST_DEFS.forEach(def=>{
+      this.quests[def.id]={
+        def,
+        status: def.prereq.length===0?'available':'locked',
+        objectives: def.objectives.map(o=>({...o})) // deep copy progress
+      };
+    });
+    // Auto-activate available quests
+    Object.values(this.quests).forEach(q=>{ if(q.status==='available') q.status='active'; });
+    this.refreshUI();
+    this.refreshTracker();
+  },
+
+  // Called when player kills an enemy
+  onKill(enemy){
+    this._update('kill_any');
+    this._update('kill_grade', {grade:enemy.grade});
+    this._checkUnlock();
+  },
+
+  // Called when player visits a zone
+  onVisitZone(zoneIdx){
+    this._update('visit_zone', {zoneIdx});
+    this._checkUnlock();
+  },
+
+  // Called when domain expansion is used
+  onDomainUse(){
+    this._update('use_domain');
+    this._checkUnlock();
+  },
+
+  // Called at end of victorious battle
+  onBattleWin(playerHp, playerMaxHp){
+    if(playerHp/playerMaxHp>=0.5){
+      this._update('clean_win');
+      this._checkUnlock();
+    }
+  },
+
+  _update(type, extra={}){
+    Object.values(this.quests).forEach(q=>{
+      if(q.status!=='active') return;
+      let changed=false;
+      q.objectives.forEach(obj=>{
+        if(obj.cur>=obj.need) return;
+        let match=false;
+        if(obj.type===type){
+          if(type==='kill_grade'){ match=extra.grade===obj.grade; }
+          else if(type==='visit_zone'){ match=extra.zoneIdx===obj.zoneIdx; }
+          else { match=true; }
+        }
+        if(match){ obj.cur=Math.min(obj.need,obj.cur+1); changed=true; }
+      });
+      if(changed){
+        // Check if all objectives complete
+        if(q.objectives.every(o=>o.cur>=o.need)){
+          q.status='done';
+          this._onQuestComplete(q);
+        }
+      }
+    });
+    this.refreshUI();
+    this.refreshTracker();
+  },
+
+  _onQuestComplete(q){
+    const p=G.player;
+    if(p) q.def.applyReward(p);
+    this._showCompleteBanner(q.def);
+    G.notify(`✅ Quest Complete: ${q.def.name}!`, 4000);
+    // Spawn reward particles
+    if(p) for(let i=0;i<20;i++) G.spawnParticle(p.x,p.y,'#fbbf24',4,1);
+  },
+
+  _checkUnlock(){
+    QUEST_DEFS.forEach(def=>{
+      const q=this.quests[def.id];
+      if(q.status!=='locked') return;
+      const prereqMet=def.prereq.every(pid=>this.quests[pid]?.status==='done');
+      if(prereqMet){ q.status='active'; G.notify(`📋 New Quest: ${def.name}!`,3000); }
+    });
+  },
+
+  _showCompleteBanner(def){
+    const el=document.createElement('div');
+    el.className='q-complete-banner';
+    el.innerHTML=`<div class="qcb-label">✅ Quest Complete</div>
+      <div style="font-size:2rem;margin-bottom:6px">${def.icon}</div>
+      <div class="qcb-name">${def.name}</div>
+      <div class="qcb-reward">🎁 ${def.reward.desc}</div>`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3600);
+  },
+
+  // Returns the first active quest (for tracker)
+  getActiveQuest(){
+    return Object.values(this.quests).find(q=>q.status==='active')||null;
+  },
+
+  refreshTracker(){
+    const aq=this.getActiveQuest();
+    const tracker=document.getElementById('q-tracker');
+    if(!aq||!G.running){ tracker.style.display='none'; return; }
+    tracker.style.display='block';
+    document.getElementById('qt-name').textContent=aq.def.icon+' '+aq.def.name;
+    const objsEl=document.getElementById('qt-objs');
+    objsEl.innerHTML=aq.objectives.slice(0,3).map(o=>{
+      const pct=Math.min(100,(o.cur/o.need)*100);
+      const done=o.cur>=o.need;
+      return `<div class="qt-obj">
+        <span style="color:${done?'#4ade80':'#aaa'};font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${done?'✅':''} ${o.label}</span>
+        <div class="qt-bar"><div class="qt-barfill" style="width:${pct}%"></div></div>
+        <span style="font-size:.6rem;color:#888;white-space:nowrap">${o.cur}/${o.need}</span>
+      </div>`;
+    }).join('');
+    // Badge count
+    const active=Object.values(this.quests).filter(q=>q.status==='active').length;
+    document.getElementById('qbtn-badge').textContent=active;
+  },
+
+  refreshUI(){
+    const body=document.getElementById('qpanel-body');
+    if(!body) return;
+    const tab=this.activeTab;
+    const list=Object.values(this.quests).filter(q=>{
+      if(tab==='active') return q.status==='active';
+      if(tab==='available') return q.status==='locked';
+      if(tab==='done') return q.status==='done';
+      return false;
+    });
+    if(list.length===0){
+      body.innerHTML=`<div style="text-align:center;color:#555;font-size:.75rem;padding:30px 0;letter-spacing:2px">${tab==='done'?'No completed quests yet.':tab==='active'?'No active quests.':'All quests unlocked!'}</div>`;
+      return;
+    }
+    body.innerHTML=list.map(q=>this._renderQCard(q)).join('');
+  },
+
+  _renderQCard(q){
+    const done=q.status==='done';
+    const locked=q.status==='locked';
+    const pctList=q.objectives.map(o=>Math.min(100,(o.cur/o.need)*100));
+    const overallPct=pctList.reduce((a,b)=>a+b,0)/pctList.length;
+    return `<div class="qcard ${done?'done':'active'}">
+      <div class="qcard-head">
+        <div class="qcard-icon">${q.def.icon}</div>
+        <div class="qcard-meta">
+          <div class="qcard-name">${q.def.name}</div>
+          <div class="qcard-desc">${q.def.desc}</div>
+        </div>
+        <span class="qcard-status ${done?'qs-done':locked?'qs-locked':'qs-active'}">${done?'✅ Done':locked?'🔒 Locked':'⚡ Active'}</span>
+      </div>
+      ${q.objectives.map(o=>{
+        const p=Math.min(100,(o.cur/o.need)*100);
+        const odone=o.cur>=o.need;
+        return `<div class="qobj">
+          <div class="qobj-label"><span style="color:${odone?'#4ade80':'#aaa'}">${odone?'✅ ':''} ${o.label}</span><span>${o.cur}/${o.need}</span></div>
+          <div class="qobj-track"><div class="qobj-fill ${odone?'done':''}" style="width:${p}%"></div></div>
+        </div>`;
+      }).join('')}
+      ${!done?`<div class="qreward"><div class="qreward-title">🎁 Reward</div>${q.def.reward.desc}</div>`:''}
+    </div>`;
+  },
+};
+
+// ═══════════════════════════════════════════
+//  PORTALS (global, filled in genMap)
+// ═══════════════════════════════════════════
+const PORTALS = [];
+
+// ═══════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════
+G.init();
+</script>
+</body>
+</html>
