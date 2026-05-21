@@ -1,0 +1,1 @@
+The reason I started to make these games is because I wanted other people to have fun with me but I also knew that most people don't like the same animes as me so I made this JJK one and will contiune to update it and make other games for you guys
