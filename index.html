@@ -6,15 +6,13 @@
 <title>JJK: Cursed World</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at top, #1f0b32 0%, #050008 35%, #000 100%);font-family:'Segoe UI',sans-serif;color:#fff;}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at top, #180c36 0%, #050008 30%, #010005 70%, #000 100%);font-family:'Segoe UI',sans-serif;color:#fff;}
 #c{display:block;position:fixed;top:0;left:0;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%, rgba(124,63,255,.16), transparent 20%),radial-gradient(circle at 80% 15%, rgba(255,58,140,.14), transparent 18%),linear-gradient(180deg,rgba(255,255,255,.03),transparent 40%);pointer-events:none;mix-blend-mode:screen;}
-
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 15% 15%, rgba(186,85,255,.12), transparent 18%),radial-gradient(circle at 75% 10%, rgba(255,112,203,.12), transparent 20%),linear-gradient(180deg,rgba(255,255,255,.04),transparent 38%),repeating-radial-gradient(circle at 50% 60%, rgba(255,255,255,.02) 0, rgba(255,255,255,0) 18px, rgba(255,255,255,0) 22px, rgba(255,255,255,.02) 24px);pointer-events:none;mix-blend-mode:screen;}
 /* ── HUD ── */
 #hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;}
 #hud-tl{position:absolute;top:12px;left:12px;background:linear-gradient(180deg,rgba(16,8,44,.96),rgba(6,4,18,.78));border:1px solid rgba(124,63,255,.35);box-shadow:0 0 32px rgba(123,47,255,.22);border-radius:16px;padding:14px 18px;min-width:210px;backdrop-filter:blur(14px);}
 #hud-tr{position:absolute;top:12px;right:12px;background:linear-gradient(180deg,rgba(12,6,28,.96),rgba(10,0,22,.82));border:1px solid rgba(255,130,220,.25);box-shadow:0 0 32px rgba(255,58,140,.18);border-radius:16px;padding:14px 18px;text-align:right;backdrop-filter:blur(14px);}
-#hud-coins{margin-top:10px;font-size:1rem;font-weight:800;color:#facc15;letter-spacing:1px;}
 .hname{font-size:.75rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:7px;}
 .blrow{margin-bottom:5px;}
 .bll{display:flex;justify-content:space-between;font-size:.62rem;color:#999;margin-bottom:2px;}
@@ -47,6 +45,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .tdesc{font-size:.9rem;color:#ccc;letter-spacing:1px;margin-bottom:36px;max-width:520px;line-height:1.8;}
 @keyframes tglow{0%,100%{filter:drop-shadow(0 0 20px rgba(123,47,255,.5))}50%{filter:drop-shadow(0 0 55px rgba(123,47,255,.9)) drop-shadow(0 0 80px rgba(255,58,140,.4))}}
 .csel-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:22px;max-width:920px;}
+#csel{max-height:52vh;overflow-y:auto;overscroll-behavior:contain;padding-right:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;}
+#csel::-webkit-scrollbar{width:8px;}
+#csel::-webkit-scrollbar-thumb{background:rgba(123,47,255,.35);border-radius:8px;}
 .ccard{background:linear-gradient(180deg,rgba(18,12,43,.92),rgba(10,4,18,.90));border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 40px rgba(25,12,60,.22);border-radius:26px;padding:14px 12px;cursor:pointer;transition:all .25s;width:150px;text-align:center;position:relative;overflow:hidden;}.ccard::before{content:'';position:absolute;inset:0;border-radius:26px;background:radial-gradient(circle at 50% 20%,rgba(255,255,255,.08),transparent 28%);opacity:0;transition:opacity .25s;}.ccard:hover::before{opacity:1;}
 .ccard:hover,.ccard.sel{border-color:var(--a);background:linear-gradient(180deg,rgba(var(--ar),.18),rgba(10,4,18,.96));transform:translateY(-6px);box-shadow:0 18px 50px rgba(var(--ar),.24);}
 .cemoji{font-size:2rem;margin-bottom:8px;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 14px rgba(255,255,255,.06);}
@@ -57,6 +58,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .sbtn{background:linear-gradient(135deg,#bf5fff,#ff5cc1);border:none;border-radius:14px;padding:14px 42px;color:#fff;font-size:1rem;font-weight:800;letter-spacing:3px;cursor:pointer;text-transform:uppercase;transition:all .2s;box-shadow:0 8px 32px rgba(255,94,196,.3);text-shadow:0 0 10px rgba(255,255,255,.22);}
 .sbtn:hover{transform:translateY(-3px);box-shadow:0 12px 44px rgba(255,94,196,.5);}
 .sbtn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+#npc-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.96);width:min(420px,92vw);max-height:82vh;overflow:hidden;background:rgba(10,6,28,.98);border:1px solid rgba(123,47,255,.35);box-shadow:0 30px 60px rgba(0,0,0,.4);border-radius:22px;z-index:120;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;}
+#npc-panel.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+#npc-panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+#npc-panel-name{font-size:1rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#f3f4f6;}
+#npc-panel-close{background:none;border:1px solid rgba(255,255,255,.1);color:#bbb;border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;}
+#npc-panel-close:hover{border-color:#7b2fff;color:#fff;}
+#npc-panel-body{padding:16px 20px;overflow-y:auto;max-height:calc(82vh - 160px);font-size:.88rem;color:#d1d5db;line-height:1.7;}
+#npc-panel-actions{padding:0 20px 20px;display:grid;gap:10px;}
+.npc-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;}
+.npc-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.npc-card-icon{width:42px;height:42px;border-radius:12px;background:rgba(123,47,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.npc-card-title{font-size:.92rem;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;}
+.npc-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;}
+.npc-item h4{margin:0;font-size:.85rem;color:#fff;}
+.npc-item p{margin:.3rem 0 0;color:#cbd5e1;font-size:.78rem;}
+.npc-item button{border:none;border-radius:999px;background:linear-gradient(135deg,#7b2fff,#a855f7);color:#fff;padding:8px 14px;cursor:pointer;font-size:.8rem;transition:all .2s;}
+.npc-item button:disabled{opacity:.35;cursor:not-allowed;transform:none;}
 @media(max-width:720px){
   .csel-row{gap:8px;margin-bottom:18px;}
   .ccard{width:calc(50vw - 18px);padding:14px 12px;}
@@ -328,7 +346,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   <div id="hud-tr">
     <div class="hlabel">EXORCISED</div>
     <div class="hbig" id="h-kills">0</div>
-    <div id="hud-coins">✦ 0</div>
     <div style="margin-top:6px;font-size:.55rem;color:#555;letter-spacing:1px" id="h-title">Sorcerer</div>
   </div>
   <div id="mm-wrap">
@@ -337,7 +354,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   </div>
   <div id="hint">
     <b style="color:#aaa">WASD / ↑↓←→</b> — Move<br>
-    <b style="color:#aaa">E / SPACE</b> — Enter portals / interact<br>
+    <b style="color:#aaa">E / SPACE</b> — Interact<br>
     <b style="color:#aaa">Q</b> — Quest Log<br>
     <b style="color:#aaa">Walk into</b> enemies to battle
   </div>
@@ -375,6 +392,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     <button class="qtab" id="qtab-done" onclick="G.showQTab('done')">Completed</button>
   </div>
   <div id="qpanel-body"></div>
+</div>
+
+<div id="npc-panel">
+  <div id="npc-panel-head">
+    <div id="npc-panel-name">NPC</div>
+    <button id="npc-panel-close" onclick="G.closeNPCPanel()">✕</button>
+  </div>
+  <div id="npc-panel-body"></div>
+  <div id="npc-panel-actions"></div>
 </div>
 
 <!-- TITLE -->
@@ -431,7 +457,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 //  CONSTANTS
 // ═══════════════════════════════════════════
 const TS = 48; // tile size px
-const COLS = 150, ROWS = 96;
+const COLS = 120, ROWS = 84;
 
 const T = { GRASS:0, DIRT:1, ROAD:2, STONE:3, WATER:4, TREE:5,
             WALL:6, BUILDING:7, FLOOR:8, DARK:9, RUIN:10,
@@ -564,35 +590,45 @@ const CHARS = [
     {id:'dance', name:'SILVER DANCE', desc:'Multi-hit combo', cost:40, type:'atk', pow:[60,90], crit:25, emoji:'💫'},
     {id:'dom', name:'MOONLIGHT SANTUARIO', desc:'Domain Expansion', cost:92, type:'domain', pow:[160,218], crit:29, emoji:'🌠'}
    ]},
-  {id:'yuta', name:'YUTA OKKOTSU', title:'Cursed Vessel', emoji:'🔗', grade:'SPECIAL GRADE',
-   acc:'#f43f5e', ar:'244,63,94', spd:3.25,
-   hp:300, maxHp:300, ce:140, maxCe:140, ceRegen:23, hpRegen:0.18,
-   bodyColor:'#bf1650', hairColor:'#fde68a', outlineColor:'#881337',
+  {id:'kin', name:'KINO SORA', title:'Nova Duelist', emoji:'✨', grade:'GRADE 2',
+   acc:'#fbbf24', ar:'251,211,93', spd:3.2,
+   hp:255, maxHp:255, ce:118, maxCe:118, ceRegen:18, hpRegen:0.16,
+   bodyColor:'#fde68a', hairColor:'#fef08a', outlineColor:'#b45309',
    moves:[
-    {id:'bind', name:'RESTRAINT BIND', desc:'Cursed chain strike', cost:20, type:'atk', pow:[52,78], crit:22, emoji:'🔗'},
-    {id:'curse', name:'CURSED FLAME', desc:'Flame burst attack', cost:35, type:'spec', pow:[84,120], crit:28, emoji:'🔥'},
-    {id:'merge', name:'CURSE AMPLIFY', desc:'Boost next attack', cost:35, type:'buff', buff:{stat:'atk',val:.35,turns:2}, emoji:'⚡'},
-    {id:'dom', name:'SEALED LOVE', desc:'Domain Expansion', cost:95, type:'domain', pow:[170,230], crit:32, emoji:'💠'}
+    {id:'flare', name:'STAR SHARD', desc:'Searing projectile', cost:18, type:'atk', pow:[48,72], crit:24, emoji:'✨'},
+    {id:'flash', name:'PRISM DANCE', desc:'Dazzling assault', cost:32, type:'spec', pow:[70,104], crit:26, emoji:'💫'},
+    {id:'reflex', name:'ASTRAL GUARD', desc:'Speed + shield', cost:28, type:'buff', buff:{stat:'spd',val:.3,turns:2}, emoji:'🛡️'},
+    {id:'dom', name:'COSMIC VAULT', desc:'Domain Expansion', cost:90, type:'domain', pow:[158,214], crit:30, emoji:'🌌'}
    ]},
-  {id:'mai', name:'MAI ZENIN', title:'Precision Shooter', emoji:'🎯', grade:'GRADE 1',
-   acc:'#fb7185', ar:'251,113,133', spd:3.0,
-   hp:275, maxHp:275, ce:125, maxCe:125, ceRegen:19, hpRegen:0.16,
-   bodyColor:'#9333ea', hairColor:'#fbcfe8', outlineColor:'#7e22ce',
+  {id:'momo', name:'MOMO RYOKU', title:'Spirit Weaver', emoji:'🕊️', grade:'GRADE 1',
+   acc:'#60a5fa', ar:'96,165,250', spd:3.0,
+   hp:270, maxHp:270, ce:128, maxCe:128, ceRegen:20, hpRegen:0.16,
+   bodyColor:'#93c5fd', hairColor:'#dbeafe', outlineColor:'#1e40af',
    moves:[
-    {id:'shot', name:'STAR SHOT', desc:'Precision ranged hit', cost:18, type:'atk', pow:[48,74], crit:24, emoji:'🎯'},
-    {id:'trap', name:'SNARE DOT', desc:'Trip wire DoT', cost:30, type:'spec', pow:[50,70], crit:18, dot:{dmg:22,turns:3}, emoji:'🪤'},
-    {id:'armor', name:'GILDED GUARD', desc:'Defense boost', cost:28, type:'buff', buff:{stat:'def',val:.3,turns:2}, emoji:'🛡️'},
-    {id:'dom', name:'GATE OF FATE', desc:'Domain Expansion', cost:88, type:'domain', pow:[150,208], crit:28, emoji:'🔮'}
+    {id:'pulse', name:'WIND PULSE', desc:'Gentle spirit strike', cost:20, type:'atk', pow:[50,76], crit:22, emoji:'🌬️'},
+    {id:'bind', name:'SILKEN BIND', desc:'Enemy slow + cripple', cost:30, type:'spec', pow:[62,90], crit:24, debuff:{stat:'spd',val:.2,turns:2}, emoji:'🕸️'},
+    {id:'aura', name:'SOUL SHIELD', desc:'Defense aura', cost:25, type:'buff', buff:{stat:'def',val:.3,turns:2}, emoji:'🛡️'},
+    {id:'dom', name:'GARDEN OF WINGS', desc:'Domain Expansion', cost:88, type:'domain', pow:[152,208], crit:29, emoji:'🕊️'}
    ]},
-  {id:'choso', name:'CHOSO', title:'Blood Brother', emoji:'🩸', grade:'GRADE 1',
-   acc:'#ef4444', ar:'239,68,68', spd:3.1,
-   hp:295, maxHp:295, ce:115, maxCe:115, ceRegen:18, hpRegen:0.17,
-   bodyColor:'#881337', hairColor:'#f87171', outlineColor:'#7f1d1d',
+  {id:'tsuki', name:'TSUKI ARAKI', title:'Moonblade', emoji:'🌙', grade:'GRADE 2',
+   acc:'#8b5cf6', ar:'139,92,246', spd:3.1,
+   hp:260, maxHp:260, ce:130, maxCe:130, ceRegen:19, hpRegen:0.16,
+   bodyColor:'#818cf8', hairColor:'#ede9fe', outlineColor:'#5b21b6',
    moves:[
-    {id:'drip', name:'BLOOD DRIP', desc:'Piercing blood attack', cost:20, type:'atk', pow:[50,76], crit:24, emoji:'🩸'},
-    {id:'pulse', name:'RAGING PULSE', desc:'Enemy bleed and stun', cost:38, type:'spec', pow:[72,108], crit:28, emoji:'💥'},
-    {id:'flow', name:'HEMOGLOBIN WARD', desc:'Life shield', cost:25, type:'buff', buff:{stat:'def',val:.28,turns:2}, emoji:'🛡️'},
-    {id:'dom', name:'BLOOD REALM', desc:'Domain Expansion', cost:90, type:'domain', pow:[156,214], crit:30, emoji:'🩸'}
+    {id:'lunar', name:'MOON SLICE', desc:'Quick crescent slash', cost:18, type:'atk', pow:[48,74], crit:24, emoji:'🌙'},
+    {id:'shade', name:'LUNAR SHADE', desc:'Create a shadow blade', cost:32, type:'spec', pow:[66,96], crit:26, emoji:'🌘'},
+    {id:'phase', name:'PHASE SHIFT', desc:'Dodge and counter', cost:28, type:'buff', buff:{stat:'spd',val:.2,turns:2}, emoji:'✨'},
+    {id:'dom', name:'MOONLIGHT ECLIPSE', desc:'Domain Expansion', cost:96, type:'domain', pow:[168,222], crit:31, emoji:'🌑'}
+   ]},
+  {id:'rei', name:'REI KAGE', title:'Night Shade', emoji:'🌌', grade:'GRADE 1',
+   acc:'#4f46e5', ar:'79,70,229', spd:3.0,
+   hp:280, maxHp:280, ce:118, maxCe:118, ceRegen:18, hpRegen:0.15,
+   bodyColor:'#4338ca', hairColor:'#c7d2fe', outlineColor:'#312e81',
+   moves:[
+    {id:'shadow', name:'SHADOW BLADE', desc:'Strike from darkness', cost:20, type:'atk', pow:[50,76], crit:22, emoji:'🌑'},
+    {id:'cloaked', name:'CLOAKED STEP', desc:'Lower enemy accuracy', cost:30, type:'spec', pow:[0,0], crit:0, debuff:{stat:'acc',val:.2,turns:2}, emoji:'🕶️'},
+    {id:'night', name:'NIGHTFALL RUSH', desc:'Rapid cursed strikes', cost:40, type:'spec', pow:[72,104], crit:26, emoji:'🌒'},
+    {id:'dom', name:'DUSK REALM', desc:'Domain Expansion', cost:90, type:'domain', pow:[160,214], crit:29, emoji:'🌃'}
    ]}
 ];
 
@@ -618,34 +654,25 @@ const ZONES = [
   {name:'Cursed Forest',   bgHint:'#0a100a'},
   {name:'Demon Tower',     bgHint:'#100810'},
   {name:'Trade District',  bgHint:'#1a011a'},
-  {name:'Moonlit Falls',   bgHint:'#0a1030'},
   {name:'Shadow Realm',    bgHint:'#07070f'},
 ];
 
-const ZONE_AREAS = [
-  {x1:1,x2:22,y1:1,y2:17},
-  {x1:32,x2:55,y1:2,y2:16},
-  {x1:26,x2:45,y1:20,y2:34},
-  {x1:56,x2:79,y1:24,y2:41},
-  {x1:66,x2:95,y1:2,y2:18},
-  {x1:1,x2:29,y1:42,y2:72},
-  {x1:40,x2:60,y1:44,y2:68},
-  {x1:24,x2:54,y1:74,y2:92},
-  {x1:104,x2:146,y1:58,y2:92},
-  {x1:76,x2:102,y1:46,y2:95},
-];
-
-const BOSS_TEMPLATES = [
-  {name:'ACADEMY WARDEN',    emoji:'🕯️', hp:520, ce:160, ceRegen:18, pow:[42,68], sp:[86,122], sc:35, sn:'Wailing Scream',   dp:[210,250], dn:'Soul Chamber',     acc:'#eab308', coin:[90,110]},
-  {name:'MARKET PHANTOM',    emoji:'🧿', hp:480, ce:150, ceRegen:20, pow:[40,66], sp:[82,118], sc:34, sn:'Blight Exchange',   dp:[198,236], dn:'Gilded Abyss',     acc:'#38bdf8', coin:[88,112]},
-  {name:'GATESPIRIT',        emoji:'⛩️', hp:500, ce:155, ceRegen:19, pow:[44,70], sp:[88,126], sc:36, sn:'Shrine Ruin',      dp:[205,245], dn:'Celestial Gate',   acc:'#a855f7', coin:[92,116]},
-  {name:'SHIBUYA RAVAGER',   emoji:'🚧', hp:540, ce:170, ceRegen:20, pow:[48,74], sp:[92,130], sc:38, sn:'Crowd Surge',      dp:[216,256], dn:'Neon Collapse',    acc:'#fb7185', coin:[98,128]},
-  {name:'ARCANIST OF RUIN',  emoji:'📜', hp:560, ce:175, ceRegen:21, pow:[52,78], sp:[96,138], sc:40, sn:'Runic Downpour',   dp:[224,264], dn:'Ancient Eclipse',  acc:'#8b5cf6', coin:[106,138]},
-  {name:'FOREST ABOMINATION', emoji:'🌲', hp:530, ce:165, ceRegen:19, pow:[46,72], sp:[90,128], sc:37, sn:'Rotting Vines',    dp:[212,250], dn:'Verdant Maw',      acc:'#22c55e', coin:[94,124]},
-  {name:'TOWER OVERLORD',    emoji:'🏯', hp:580, ce:180, ceRegen:22, pow:[54,80], sp:[100,142], sc:42, sn:'Spire Collapse',   dp:[230,270], dn:'Iron Citadel',    acc:'#f97316', coin:[110,142]},
-  {name:'COMMERCE GHOST',     emoji:'💰', hp:500, ce:160, ceRegen:19, pow:[44,70], sp:[86,124], sc:35, sn:'Debt Strike',      dp:[206,246], dn:'Market Maze',      acc:'#f59e0b', coin:[88,118]},
-  {name:'LUMINOUS WRAITH',   emoji:'🌙', hp:570, ce:175, ceRegen:21, pow:[52,80], sp:[98,140], sc:41, sn:'Moonlit Torrent',  dp:[228,268], dn:'Falling Cascade',  acc:'#60a5fa', coin:[112,146]},
-  {name:'SHADOW LORD',       emoji:'🌑', hp:620, ce:190, ceRegen:23, pow:[56,84], sp:[104,148], sc:44, sn:'Nightmare Burst',  dp:[240,284], dn:'Eclipse Realm',    acc:'#0f172a', coin:[124,160]},
+const NPCS = [
+  {id:'kento', name:'KENTO', type:'quest', x:10.5*TS, y:10.5*TS, label:'Quest Mentor', desc:'The instructor who assigns powerful missions.', quests:['q_first_blood','q_domain_user','q_curse_breaker'], dialog:'You have a long road ahead. Accept a quest, defeat curses, and return stronger.'},
+  {id:'market', name:'MARKET MERCHANT', type:'shop', x:43.5*TS, y:8.5*TS, label:'Curse Shop', desc:'A vendor selling combat boosts and relics.', items:[
+    {id:'atk_boost', name:'Attack Amulet', desc:'+10% attack damage', cost:80, apply:p=>p.attackBonus=(p.attackBonus||0)+0.10},
+    {id:'def_boost', name:'Defense Charm', desc:'-10% incoming damage', cost:70, apply:p=>p.defenseBonus=(p.defenseBonus||0)+0.10},
+    {id:'ce_crystal', name:'CE Crystal', desc:'+20 Max CE', cost:60, apply:p=>{p.maxCe+=20;p.ce=Math.min(p.maxCe,p.ce+20);}},
+    {id:'hp_elixir', name:'Vitality Elixir', desc:'+30 Max HP', cost:90, apply:p=>{p.maxHp+=30;p.hp=Math.min(p.hp+30,p.maxHp);}}
+  ]},
+  {id:'elder', name:'RUIN ELDER', type:'quest', x:73.5*TS, y:13.5*TS, label:'Ancient Scout', desc:'A sage in the ruins with exploration quests.', quests:['q_explorer','q_shadow_hunter'], dialog:'The ruins are restless. Explore the zones and hunt powerful curses.'},
+  {id:'forest', name:'FOREST SPIRIT', type:'quest', x:18.5*TS, y:56.5*TS, label:'Forest Guardian', desc:'A guardian who asks you to clean the woods.', quests:['q_initiation','q_grade1'], dialog:'The forest whispers of cursed spirits. Clear them and protect the land.'},
+  {id:'trade', name:'TRADE MERCHANT', type:'shop', x:87.5*TS, y:63.5*TS, label:'Armory', desc:'A traveling trader with steel and charms.', items:[
+    {id:'atk_gear', name:'Steel Training Gear', desc:'+12% attack', cost:100, apply:p=>p.attackBonus=(p.attackBonus||0)+0.12},
+    {id:'def_plate', name:'Barrier Plate', desc:'-12% incoming damage', cost:95, apply:p=>p.defenseBonus=(p.defenseBonus||0)+0.12},
+    {id:'hp_tonic', name:'Tonic of Vitality', desc:'+40 Max HP', cost:110, apply:p=>{p.maxHp+=40;p.hp=Math.min(p.hp+40,p.maxHp);}},
+    {id:'ce_orb', name:'Orb of Focus', desc:'+25 Max CE', cost:105, apply:p=>{p.maxCe+=25;p.ce=Math.min(p.maxCe,p.ce+25);}}
+  ]}
 ];
 
 // ═══════════════════════════════════════════
@@ -721,33 +748,16 @@ function genMap() {
   rect(46,56,8,12,T.LAVA);
   rect(42,50,4,4,T.BUILDING);
 
-  // ── Shadow Realm (far right) ──
-  for(let r=46;r<ROWS-2;r++) for(let c=76;c<COLS-4;c++) {
-    MAP[r][c]=Math.random()<0.34?T.RUIN:T.DARK;
+  // ── Shadow Realm (bottom-right) ──
+  for(let r=46;r<ROWS-1;r++) for(let c=60;c<COLS-1;c++) {
+    MAP[r][c]=Math.random()<0.35?T.RUIN:T.DARK;
   }
-  rect(76,50,10,8,T.RUIN);
-  rect(88,56,8,10,T.DARK);
-  rect(96,68,6,12,T.LAVA);
-  rect(104,62,10,14,T.CRYSTAL);
-
-  // ── Trade District (bottom-center) ──
-  rect(24,74,32,18,T.ROAD);
-  for(let br=76;br<90;br+=5) for(let bc=28;bc<54;bc+=6){ rect(bc,br,4,4,T.BUILDING); }
-  for(let c=28;c<54;c+=10){ MAP[74][c]=T.BRIDGE; }
-  rect(34,78,6,4,T.SAND);
-  rect(46,82,6,6,T.STONE);
-
-  // ── Moonlit Falls (far right) ──
-  for(let r=58;r<88;r+=4){
-    for(let c=108;c<COLS-4;c+=8){ MAP[r][c]=T.WATER; }
-  }
-  rect(106,64,22,10,T.FLOOR);
-  rect(110,68,14,8,T.CRYSTAL);
-  for(let c=108;c<132;c+=10){ MAP[76][c]=T.BRIDGE; }
-  rect(118,72,8,12,T.LAVA);
+  rect(66,50,10,8,T.RUIN);
+  rect(76,56,8,8,T.DARK);
+  rect(86,60,6,6,T.LAVA);
 
   // ── Forest & crystal accents ──
-  for(let i=0;i<320;i++){
+  for(let i=0;i<280;i++){
     let r=ri(2,ROWS-2),c=ri(2,COLS-2);
     if(MAP[r][c]===T.GRASS) MAP[r][c]=Math.random()<0.65?T.TREE:T.STONE;
     else if(MAP[r][c]===T.SAND && Math.random()<0.08) MAP[r][c]=T.CRYSTAL;
@@ -763,10 +773,8 @@ function genMap() {
     {c:76,r:8, label:'ANCIENT RUINS',  zoneIdx:4},
     {c:12,r:52,label:'CURSED FOREST', zoneIdx:5},
     {c:48,r:44,label:'DEMON TOWER',   zoneIdx:6},
-    {c:36,r:78,label:'TRADE DISTRICT',zoneIdx:7},
-    {c:116,r:72,label:'MOONLIT FALLS', zoneIdx:8},
-    {c:92,r:58, label:'SHADOW REALM',  zoneIdx:9},
-  ].forEach(p=>{ MAP[p.r][p.c]=T.PORTAL; p.cleared=false; p.boss=BOSS_TEMPLATES[p.zoneIdx]; PORTALS.push(p); });
+    {c:78,r:56,label:'SHADOW REALM',  zoneIdx:7},
+  ].forEach(p=>{ MAP[p.r][p.c]=T.PORTAL; PORTALS.push(p); });
 }
 
 function rect(c,r,w,h,t){
@@ -804,6 +812,10 @@ const G = {
   kills: 0,
   zoneIdx: 0,
   selectedChar: null,
+  cameraZoom: 1,
+  minZoom: 0.78,
+  maxZoom: 1.5,
+  zoomStep: 0.08,
   raf: null,
   notifTimer: null,
   interactTimer: null,
@@ -820,6 +832,12 @@ const G = {
       e.preventDefault&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE'].includes(e.code)&&e.preventDefault();
     });
     window.addEventListener('keyup',   e=>{ this.keys[e.code]=false; this.keys[e.key]=false; });
+    this.canvas.addEventListener('wheel', e=>{
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -this.zoomStep : this.zoomStep;
+      this.cameraZoom = clamp(this.cameraZoom + delta, this.minZoom, this.maxZoom);
+      this.notify(`🔍 Zoom ${Math.round(this.cameraZoom*100)}%`, 900);
+    }, {passive:false});
     this.setupDpad();
     this.buildCharSelect();
   },
@@ -859,7 +877,7 @@ const G = {
     this.kills = 0;
     this.zoneIdx = 0;
     this.spawnPlayer();
-    this.spawnEnemies(64);
+    this.spawnEnemies(46);
     QM.init();
     this.running = true;
     this.last = performance.now();
@@ -976,22 +994,36 @@ const G = {
 
     // ── Zone detection ──
     let col=Math.floor(p.x/TS), row=Math.floor(p.y/TS);
-    const area = ZONE_AREAS.find(a=>col>=a.x1&&col<=a.x2&&row>=a.y1&&row<=a.y2);
-    let z = area ? ZONE_AREAS.indexOf(area) : this.zoneIdx;
+    let z=0;
+    if(col>=1&&col<=22&&row>=1&&row<=17) z=0;
+    else if(col>=32&&col<=55&&row>=2&&row<=16) z=1;
+    else if(col>=26&&col<=45&&row>=20&&row<=34) z=2;
+    else if(col>=56&&col<=79&&row>=24&&row<=41) z=3;
+    else if(col>=66&&col<=95&&row>=2&&row<=18) z=4;
+    else if(col<=29&&row>=42) z=5;
+    else if(col>=40&&col<=60&&row>=44&&row<=67) z=6;
+    else if(col>=76&&row>=46) z=7;
+    else if(col>=60&&row>=46) z=8;
     if(z!==this.zoneIdx){ this.zoneIdx=z; this.notify('📍 '+ZONES[z].name); QM.onVisitZone(z); }
 
     // Interact prompt
-    let nearPortal = this.nearestPortal(col,row);
-    if(nearPortal){
-      document.getElementById('interact').textContent = `Press E to enter ${nearPortal.label}`;
-      document.getElementById('interact').style.opacity='1';
+    const nearObj = this.getNearbyInteract(col,row);
+    const interactEl = document.getElementById('interact');
+    if(nearObj){
+      const prompt = nearObj.type==='portal'
+        ? `Press E to enter ${nearObj.label}`
+        : nearObj.type==='shop'
+          ? `Press E to browse ${nearObj.label}`
+          : `Press E to talk to ${nearObj.name}`;
+      interactEl.textContent = prompt;
+      interactEl.style.opacity = '1';
     } else {
-      document.getElementById('interact').style.opacity='0';
+      interactEl.style.opacity = '0';
     }
 
-    if((this.keys['KeyE']||this.keys['e']||this.keys['Space'])&&nearPortal) {
+    if((this.keys['KeyE']||this.keys['e']||this.keys['Space'])&&nearObj) {
       this.keys['KeyE']=false; this.keys['e']=false; this.keys['Space']=false;
-      this.enterPortal(nearPortal);
+      this.handleInteract(nearObj);
     }
 
     // ── Enemy AI ──
@@ -1033,7 +1065,7 @@ const G = {
     });
 
     // Spawn more enemies if needed
-    if(this.enemies.length<28) this.trySpawnEnemy();
+    if(this.enemies.length<20) this.trySpawnEnemy();
   },
 
   canWalk(wx,wy) {
@@ -1046,45 +1078,120 @@ const G = {
     return PORTALS.find(p=>Math.abs(p.c-col)<=1&&Math.abs(p.r-row)<=1)||null;
   },
 
-  enterPortal(portal) {
-    if(portal.cleared){
-      this.notify(`✨ ${portal.label} portal already stabilized.`);
+  getNearbyInteract(col,row){
+    const npc=NPCS.find(n=>Math.abs(Math.floor(n.x/TS)-col)<=1&&Math.abs(Math.floor(n.y/TS)-row)<=1);
+    if(npc) return npc;
+    const portal=this.nearestPortal(col,row);
+    if(portal) return {...portal,type:'portal'};
+    return null;
+  },
+
+  handleInteract(obj){
+    if(obj.type==='portal'){
+      const target = PORTALS.find(p=>p.c===obj.c&&p.r===obj.r);
+      if(target){
+        this.player.x=(target.c+0.5)*TS; this.player.y=(target.r+2.5)*TS;
+        this.notify(`✨ Teleported to ${target.label}`);
+        QM.onVisitZone(target.zoneIdx);
+      }
       return;
     }
-    this.notify(`🌌 Entering portal to ${portal.label}...`);
-    this.player.x = (portal.c + 0.5) * TS;
-    this.player.y = (portal.r + 1.2) * TS;
-    setTimeout(()=>this.startBossFight(portal), 500);
+    if(obj.type==='shop'){
+      this.openShop(obj);
+      return;
+    }
+    if(obj.type==='quest'){
+      this.showNPCPanel(obj);
+      return;
+    }
   },
 
-  startBossFight(portal) {
-    const boss = JSON.parse(JSON.stringify(portal.boss || BOSS_TEMPLATES[portal.zoneIdx]));
-    boss.id = `boss_${portal.zoneIdx}`;
-    boss.grade = 'BOSS';
-    boss.maxHp = boss.hp;
-    boss.maxCe = boss.ce;
-    boss.buffs=[]; boss.debuffs=[]; boss.dots=[];
-    boss.coin = ri(boss.coin[0], boss.coin[1]);
-    boss.frame=0; boss.frameTick=0;
-    this.startCombat(boss, {bossPortal: portal});
+  openShop(shop){
+    const panel=document.getElementById('npc-panel');
+    document.getElementById('npc-panel-name').textContent=shop.name;
+    const body=document.getElementById('npc-panel-body');
+    const actions=document.getElementById('npc-panel-actions');
+    body.innerHTML=`<div class="npc-card"><div class="npc-card-head"><div class="npc-card-icon">🛍️</div><div><div class="npc-card-title">${shop.label}</div><div style="font-size:.78rem;color:#aaa;margin-top:4px;">${shop.desc}</div></div></div><div style="font-size:.85rem;color:#d2d6f0;line-height:1.6;">Spend coins to boost your attack, defense, HP, and CE power.</div></div>`;
+    actions.innerHTML=shop.items.map(item=>{
+      const disabled = this.player.coins < item.cost ? 'disabled' : '';
+      return `<div class="npc-item"><div><h4>${item.name}</h4><p>${item.desc}</p></div><button ${disabled} onclick="G.buyShopItem('${shop.id}','${item.id}')">${item.cost} ✦</button></div>`;
+    }).join('');
+    panel.classList.add('open');
   },
 
+  closeNPCPanel(){
+    document.getElementById('npc-panel').classList.remove('open');
+  },
+
+  showNPCPanel(npc){
+    const panel=document.getElementById('npc-panel');
+    document.getElementById('npc-panel-name').textContent=npc.name;
+    const body=document.getElementById('npc-panel-body');
+    const actions=document.getElementById('npc-panel-actions');
+    const questText = npc.dialog || npc.desc || '';
+    body.innerHTML=`<div class="npc-card"><div class="npc-card-head"><div class="npc-card-icon">${npc.type==='quest'?'🧭':'👤'}</div><div><div class="npc-card-title">${npc.label}</div><div style="font-size:.78rem;color:#aaa;margin-top:4px;">${questText}</div></div></div></div>`;
+    if(npc.quests){
+      actions.innerHTML = npc.quests.map(qid=>{
+        const q=QM.quests[qid];
+        const status = q ? q.status : 'locked';
+        const prereqOk = q && q.def.prereq.every(pid=>QM.quests[pid]?.status==='done');
+        const label = status==='done' ? 'Completed' : status==='active' ? 'Accepted' : prereqOk ? 'Accept' : 'Locked';
+        const disabled = (status!=='locked' || !prereqOk) ? 'disabled' : '';
+        const desc = q ? q.def.desc : '';
+        return `<div class="npc-item"><div><h4>${q.def.name}</h4><p>${desc}</p></div><button ${disabled} onclick="G.acceptNPCQuest('${npc.id}','${qid}')">${label}</button></div>`;
+      }).join('');
+    } else {
+      actions.innerHTML='';
+    }
+    panel.classList.add('open');
+  },
+
+  acceptNPCQuest(npcId, questId){
+    const npc = NPCS.find(n=>n.id===npcId);
+    if(!npc) return;
+    const accepted = QM.assignQuest(npcId, questId);
+    if(accepted){
+      this.notify('📜 Quest accepted! Check your Quest Log.', 3200);
+      this.closeNPCPanel();
+    } else {
+      this.notify('⚠️ This quest is not ready yet.', 2200);
+    }
+  },
+  buyShopItem(shopId,itemId){
+    const shop = NPCS.find(n=>n.id===shopId && n.type==='shop');
+    if(!shop) return;
+    const item = shop.items.find(i=>i.id===itemId);
+    if(!item || this.player.coins < item.cost) return;
+    this.player.coins -= item.cost;
+    item.apply(this.player);
+    this.notify(`💰 Purchased ${item.name}`);
+    this.updateHUD();
+    this.openShop(shop);
+  },
+
+  // ── DRAW ──
   // ── DRAW ──
   draw() {
     const cv=this.canvas, ctx=this.ctx, p=this.player;
     if(!p) return;
 
+    const zoom = this.cameraZoom;
+    const viewW = cv.width / zoom;
+    const viewH = cv.height / zoom;
+
     // Camera centers on player
-    let camX = p.x - cv.width/2;
-    let camY = p.y - cv.height/2;
-    camX = clamp(camX, 0, COLS*TS - cv.width);
-    camY = clamp(camY, 0, ROWS*TS - cv.height);
+    let camX = p.x - viewW/2;
+    let camY = p.y - viewH/2;
+    camX = clamp(camX, 0, COLS*TS - viewW);
+    camY = clamp(camY, 0, ROWS*TS - viewH);
 
     ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.save();
+    ctx.scale(zoom, zoom);
 
     // Visible tile range
-    const sc=Math.floor(camX/TS)-1, ec=Math.ceil((camX+cv.width)/TS)+1;
-    const sr=Math.floor(camY/TS)-1, er=Math.ceil((camY+cv.height)/TS)+1;
+    const sc=Math.floor(camX/TS)-1, ec=Math.ceil((camX+viewW)/TS)+1;
+    const sr=Math.floor(camY/TS)-1, er=Math.ceil((camY+viewH)/TS)+1;
 
     // Draw tiles
     for(let r=Math.max(0,sr);r<Math.min(ROWS,er);r++) {
@@ -1108,6 +1215,9 @@ const G = {
     // Draw enemies
     this.enemies.forEach(e=>this.drawEnemy(ctx,e,camX,camY));
 
+    // Draw NPCs and shops
+    NPCS.forEach(npc=>this.drawNPC(ctx,npc,camX,camY));
+
     // Draw player
     this.drawPlayer(ctx,p,camX,camY);
 
@@ -1120,6 +1230,7 @@ const G = {
       ctx.fillText(ft.text,ft.x-camX,ft.y-camY);
     });
     ctx.globalAlpha=1;
+    ctx.restore();
     ctx.textAlign='left';
   },
 
@@ -1177,53 +1288,49 @@ const G = {
       ctx.beginPath(); ctx.arc(sx+26,sy+14,9,0,Math.PI*2); ctx.fill();
     }
     else if(t===T.BUILDING) {
-      const grad=ctx.createLinearGradient(sx,sy,sx+TS,sy+TS);
-      grad.addColorStop(0,'rgba(138,43,226,0.95)');
-      grad.addColorStop(1,'rgba(34,31,77,0.95)');
-      ctx.fillStyle=grad;
+      ctx.fillStyle='#221f4d';
       ctx.fillRect(sx+2,sy+2,TS-4,TS-4);
-      ctx.strokeStyle='rgba(255,255,255,0.12)';
+      ctx.strokeStyle='rgba(150,110,255,0.3)';
       ctx.lineWidth=1.5;
       ctx.strokeRect(sx+2,sy+2,TS-4,TS-4);
-      // WINDOWS
-      ctx.fillStyle='rgba(200,180,255,0.28)';
+      // Windows
+      ctx.fillStyle='rgba(164,144,255,0.32)';
       ctx.fillRect(sx+8,sy+8,10,10);
       ctx.fillRect(sx+30,sy+8,10,10);
-      ctx.fillStyle='rgba(255,255,255,0.1)';
+      ctx.fillStyle='rgba(255,255,255,0.08)';
       ctx.fillRect(sx+18,sy+18,12,6);
       ctx.strokeStyle='rgba(255,255,255,0.08)';
       ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(sx+10,sy+20); ctx.lineTo(sx+38,sy+20); ctx.stroke();
     }
     else if(t===T.WALL) {
-      ctx.fillStyle='rgba(15,15,30,0.98)';
+      ctx.fillStyle='#0f0f1e';
       ctx.fillRect(sx,sy,TS,TS);
-      ctx.strokeStyle='rgba(80,80,120,0.35)';
+      ctx.strokeStyle='rgba(60,60,100,0.4)';
       ctx.lineWidth=1;
       ctx.strokeRect(sx,sy,TS,TS);
     }
     else if(t===T.PORTAL) {
-      const pulse=0.6+Math.sin(Date.now()*0.005)*0.35;
-      ctx.shadowBlur=18;
-      ctx.shadowColor='rgba(165,95,255,0.55)';
-      ctx.fillStyle=`rgba(120,40,220,${pulse*0.45})`;
+      let pulse=0.6+Math.sin(Date.now()*0.005)*0.35;
+      ctx.fillStyle=`rgba(100,0,220,${pulse*0.5})`;
       ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.fill();
-      ctx.shadowBlur=0;
-      ctx.strokeStyle=`rgba(220,150,255,${pulse})`;
-      ctx.lineWidth=2.2;
+      ctx.strokeStyle=`rgba(180,80,255,${pulse})`;
+      ctx.lineWidth=2;
       ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.stroke();
+      // Rotating ring
       ctx.save();
       ctx.translate(sx+24,sy+24);
-      ctx.rotate(Date.now()*0.0025);
-      ctx.strokeStyle=`rgba(255,200,255,${pulse*0.75})`;
+      ctx.rotate(Date.now()*0.002);
+      ctx.strokeStyle=`rgba(220,120,255,${pulse*0.7})`;
       ctx.lineWidth=1.5;
-      ctx.setLineDash([4,6]);
-      ctx.beginPath(); ctx.arc(0,0,14,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([5,8]);
+      ctx.beginPath(); ctx.arc(0,0,15,0,Math.PI*2); ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
+      // Label
       let port=PORTALS.find(p=>p.c===c&&p.r===r);
-      if(port){
-        ctx.fillStyle='rgba(245,200,255,0.9)';
+      if(port) {
+        ctx.fillStyle='rgba(200,120,255,0.85)';
         ctx.font='bold 8px Segoe UI';
         ctx.textAlign='center';
         ctx.fillText(port.label,sx+24,sy+TS+10);
@@ -1231,14 +1338,10 @@ const G = {
       }
     }
     else if(t===T.SHRINE) {
-      const grad=ctx.createRadialGradient(sx+24,sy+24,4,sx+24,sy+24,22);
-      grad.addColorStop(0,'rgba(205,120,255,0.85)');
-      grad.addColorStop(1,'rgba(60,0,120,0.72)');
-      ctx.fillStyle=grad;
+      ctx.fillStyle='rgba(60,0,120,0.7)';
       ctx.fillRect(sx+4,sy+4,TS-8,TS-8);
       ctx.font='22px serif';
       ctx.textAlign='center';
-      ctx.fillStyle='rgba(255,250,240,0.92)';
       ctx.fillText('⛩️',sx+24,sy+30);
       ctx.textAlign='left';
       let gp=0.3+Math.sin(Date.now()*0.004)*0.15;
@@ -1246,14 +1349,9 @@ const G = {
       ctx.beginPath(); ctx.arc(sx+24,sy+24,22,0,Math.PI*2); ctx.fill();
     }
     else if(t===T.ROAD||t===T.FLOOR||t===T.BRIDGE) {
-      const grad = ctx.createLinearGradient(sx,sy,sx,sy+TS);
-      grad.addColorStop(0,'rgba(255,255,255,0.08)');
-      grad.addColorStop(1,TC[t]);
-      ctx.fillStyle = grad;
-      ctx.fillRect(sx,sy,TS,TS);
-      ctx.strokeStyle='rgba(255,255,255,0.06)';
-      ctx.lineWidth=0.9;
-      ctx.strokeRect(sx+1,sy+1,TS-2,TS-2);
+      ctx.strokeStyle='rgba(255,255,255,0.04)';
+      ctx.lineWidth=.5;
+      ctx.strokeRect(sx,sy,TS,TS);
     }
     else if(t===T.DARK) {
       // Random cursed particles
@@ -1273,6 +1371,20 @@ const G = {
         ctx.fillRect(sx,sy,TS,TS);
       }
     }
+  },
+
+  drawNPC(ctx,npc,camX,camY){
+    const sx = npc.x - camX;
+    const sy = npc.y - camY;
+    const isShop = npc.type==='shop';
+    ctx.save();
+    ctx.globalAlpha = 0.95;
+    ctx.fillStyle = isShop ? 'rgba(251,191,36,0.95)' : 'rgba(147,51,234,0.95)';
+    ctx.beginPath(); ctx.arc(sx,sy,10,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#fff'; ctx.font='bold 14px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(isShop ? '🛍️' : '🧭', sx, sy+4);
+    ctx.restore();
   },
 
   drawPlayer(ctx,p,camX,camY) {
@@ -1455,16 +1567,21 @@ const G = {
       mc.fillStyle='#ef4444';
       mc.fillRect(e.x/TS*sx-1,e.y/TS*sy-1,3,3);
     });
+    NPCS.forEach(npc=>{
+      mc.fillStyle=npc.type==='shop'?'#facc15':'#a855f7';
+      mc.fillRect(npc.x/TS*sx-1,npc.y/TS*sy-1,4,4);
+    });
     if(this.player) {
       let p=this.player;
       mc.fillStyle='#fbbf24';
       mc.beginPath(); mc.arc(p.x/TS*sx,p.y/TS*sy,3,0,Math.PI*2); mc.fill();
-      // Viewport outline
-      let camX=clamp(p.x-this.canvas.width/2,0,COLS*TS-this.canvas.width);
-      let camY=clamp(p.y-this.canvas.height/2,0,ROWS*TS-this.canvas.height);
+      const viewW = this.canvas.width / this.cameraZoom;
+      const viewH = this.canvas.height / this.cameraZoom;
+      let camX = clamp(p.x-viewW/2,0,COLS*TS-viewW);
+      let camY = clamp(p.y-viewH/2,0,ROWS*TS-viewH);
       mc.strokeStyle='rgba(255,255,255,0.28)';
       mc.lineWidth=1;
-      mc.strokeRect(camX/TS*sx,camY/TS*sy,this.canvas.width/TS*sx,this.canvas.height/TS*sy);
+      mc.strokeRect(camX/TS*sx,camY/TS*sy,viewW/TS*sx,viewH/TS*sy);
     }
   },
 
@@ -1492,7 +1609,7 @@ const G = {
 
     document.getElementById('h-zone').textContent='📍 '+ZONES[this.zoneIdx].name;
     document.getElementById('h-kills').textContent=this.kills;
-    document.getElementById('h-coins').textContent='✦ '+(this.player.coins||0);
+    document.getElementById('h-coins').textContent='✦ '+(p.coins||0);
     document.getElementById('h-title').textContent=LV.getTitle(lv);
   },
 
@@ -1520,7 +1637,7 @@ const G = {
   // ═══════════════════════════════════════════
   //  COMBAT SYSTEM
   // ═══════════════════════════════════════════
-  startCombat(enemy, opts={}) {
+  startCombat(enemy) {
     this.inCombat=true;
     this.combat={
       player: JSON.parse(JSON.stringify(this.player)),
@@ -1530,8 +1647,7 @@ const G = {
         maxCe:enemy.maxCe||enemy.ce,
       },
       pTurn:true, round:1,
-      enemy_ref: enemy, // ref to world enemy or boss
-      bossPortal: opts.bossPortal || null,
+      enemy_ref: enemy, // ref to world enemy
     };
     this.combat.player.buffs=[...this.player.buffs];
     this.combat.player.debuffs=[...this.player.debuffs];
@@ -1720,9 +1836,6 @@ const G = {
     const {player:p,enemy:e}=this.combat;
     if(e.hp<=0){
       this.kills++;
-      const coinGain = e.coin || 0;
-      this.player.coins = (this.player.coins||0) + coinGain;
-      if(coinGain) this.floatText(this.player.x,this.player.y-28,'+'+coinGain+' ✦','#facc15',16);
       // Award XP
       const xpResult = LV.awardXp(this.player, e);
       this.combat._xpGained = xpResult.gained;
@@ -1735,10 +1848,6 @@ const G = {
       this.combat.player.moves  = this.player.moves;
       QM.onKill(e);
       QM.onBattleWin(p.hp, p.maxHp);
-      if(this.combat.bossPortal){
-        this.combat.bossPortal.cleared=true;
-        this.notify(`🏆 Boss defeated at ${this.combat.bossPortal.label}!`);
-      }
       this.clog(`🏆 <strong>${e.name} exorcised!</strong> (+${xpResult.gained} XP)`,'s');
       if(xpResult.levelsGained.length) this.clog(`✨ LEVEL UP! Now LV ${this.player.level}!`,'h');
       setTimeout(()=>this.showResult(true),600);
@@ -1770,19 +1879,17 @@ const G = {
       this.player.buffs=this.combat.player.buffs;
       this.player.debuffs=this.combat.player.debuffs;
       this.player.dots=this.combat.player.dots;
-      if(!this.combat.bossPortal){
-        this.enemies=this.enemies.filter(e=>e!==this.combat.enemy_ref);
-      }
-      // XP and coin float text
+      // Remove world enemy
+      this.enemies=this.enemies.filter(e=>e!==this.combat.enemy_ref);
+      // XP float text
       const xg=this.combat._xpGained||0;
-      const coinGain=this.combat.enemy.coin||0;
       const lvs=this.combat._levelsGained||[];
       this.floatText(this.player.x,this.player.y-40,'+'+xg+' XP','#fbbf24',16);
-      if(coinGain) this.floatText(this.player.x,this.player.y-24,'+'+coinGain+' ✦','#facc15',16);
-      // Result screen stats
+      // Result screen XP line
       const lv=this.player.level;
-      let xpLine = lvs.length ? `✨ LEVEL UP → LV ${lv}!  +${xg} XP` : `+${xg} XP  •  LV ${lv} — ${LV.getTitle(lv)}`;
-      if(coinGain) xpLine += `  •  +${coinGain} Coins`;
+      const xpPct=Math.floor((this.player.xp/this.player.xpToNext)*100);
+      let xpLine=`+${xg} XP  •  LV ${lv} — ${LV.getTitle(lv)}`;
+      if(lvs.length) xpLine=`✨ LEVEL UP → LV ${lv}!  +${xg} XP`;
       document.getElementById('r-xp').textContent=xpLine;
     } else {
       document.getElementById('r-xp').textContent='';
@@ -1821,10 +1928,14 @@ const G = {
   calcDmg(pow,atk,def,crit=false){
     let dmg=ri(pow[0],pow[1]);
     const atkBuff=(atk.buffs||[]).find(b=>b.stat==='atk');
+    const attackBonus = atk.attackBonus||0;
+    const defenseBonus = def.defenseBonus||0;
     if(atkBuff) dmg=Math.floor(dmg*(1+atkBuff.val));
+    if(attackBonus) dmg=Math.floor(dmg*(1+attackBonus));
     const defDeb=(def.debuffs||[]).find(d=>d.stat==='def');
     if(!defDeb) dmg=Math.floor(dmg*.9);
     else dmg=Math.floor(dmg*(1+defDeb.val));
+    if(defenseBonus) dmg=Math.floor(dmg*(1-defenseBonus));
     if(crit) dmg=Math.floor(dmg*1.6);
     return Math.max(1,dmg);
   },
@@ -1906,7 +2017,6 @@ const XP_BY_GRADE = {
   'GRADE 2':        40,
   'GRADE 1':        80,
   'SPECIAL GRADE': 160,
-  'BOSS':          240,
 };
 
 // Stat gains per level-up
@@ -2074,6 +2184,7 @@ const QUEST_DEFS = [
   {
     id:'q_first_blood',
     name:'First Blood',
+    giver:'kento',
     icon:'🩸',
     desc:'Exorcise your first cursed spirit to prove yourself as a sorcerer.',
     prereq:[],
@@ -2086,6 +2197,7 @@ const QUEST_DEFS = [
   {
     id:'q_initiation',
     name:'Cursed Initiation',
+    giver:'forest',
     icon:'⚡',
     desc:'Prove your worth by defeating five cursed spirits in combat.',
     prereq:['q_first_blood'],
@@ -2098,6 +2210,7 @@ const QUEST_DEFS = [
   {
     id:'q_explorer',
     name:'World Explorer',
+    giver:'elder',
     icon:'🗺️',
     desc:'Venture into all six cursed zones across the open world.',
     prereq:[],
@@ -2115,6 +2228,7 @@ const QUEST_DEFS = [
   {
     id:'q_grade1',
     name:'Grade 1 Sorcerer',
+    giver:'kento',
     icon:'🏅',
     desc:'Defeat 10 cursed spirits to earn your Grade 1 certification.',
     prereq:['q_initiation'],
@@ -2127,6 +2241,7 @@ const QUEST_DEFS = [
   {
     id:'q_shadow_hunter',
     name:'Shadow Hunter',
+    giver:'elder',
     icon:'🌑',
     desc:'Prove your strength by defeating three Special Grade cursed spirits.',
     prereq:['q_grade1'],
@@ -2139,6 +2254,7 @@ const QUEST_DEFS = [
   {
     id:'q_domain_user',
     name:'Domain Practitioner',
+    giver:'kento',
     icon:'🏯',
     desc:'Unleash Domain Expansion in 3 battles to master the technique.',
     prereq:['q_grade1'],
@@ -2151,6 +2267,7 @@ const QUEST_DEFS = [
   {
     id:'q_curse_breaker',
     name:'Curse Breaker',
+    giver:'kento',
     icon:'💥',
     desc:'Exorcise 25 cursed spirits and become a feared sorcerer.',
     prereq:['q_shadow_hunter'],
@@ -2163,6 +2280,7 @@ const QUEST_DEFS = [
   {
     id:'q_fearless',
     name:'Fearless Fighter',
+    giver:'shrine',
     icon:'🔥',
     desc:'Win a battle without your HP dropping below 50%.',
     prereq:['q_first_blood'],
@@ -2175,6 +2293,7 @@ const QUEST_DEFS = [
   {
     id:'q_the_strongest',
     name:'The Strongest',
+    giver:'elder',
     icon:'✨',
     desc:'Exorcise 50 cursed spirits and ascend to Special Grade.',
     prereq:['q_curse_breaker'],
@@ -2198,14 +2317,33 @@ const QM = {
     QUEST_DEFS.forEach(def=>{
       this.quests[def.id]={
         def,
-        status: def.prereq.length===0?'available':'locked',
+        status: def.giver ? 'locked' : (def.prereq.length===0 ? 'active' : 'locked'),
         objectives: def.objectives.map(o=>({...o})) // deep copy progress
       };
     });
-    // Auto-activate available quests
-    Object.values(this.quests).forEach(q=>{ if(q.status==='available') q.status='active'; });
     this.refreshUI();
     this.refreshTracker();
+  },
+
+  assignQuest(giverId, questId){
+    const candidates=Object.values(this.quests).filter(q=>q.def.giver===giverId && q.status==='locked' && q.def.prereq.every(pid=>this.quests[pid]?.status==='done'));
+    if(questId){
+      const q=candidates.find(q=>q.def.id===questId);
+      if(!q) return false;
+      q.status='active';
+      this.refreshUI();
+      this.refreshTracker();
+      G.notify(`📋 Quest accepted: ${q.def.name}!`,2500);
+      return true;
+    }
+    if(candidates.length===0) return false;
+    candidates.forEach(q=>{
+      q.status='active';
+      G.notify(`📋 New Quest: ${q.def.name}!`,2500);
+    });
+    this.refreshUI();
+    this.refreshTracker();
+    return true;
   },
 
   // Called when player kills an enemy
@@ -2275,7 +2413,7 @@ const QM = {
       const q=this.quests[def.id];
       if(q.status!=='locked') return;
       const prereqMet=def.prereq.every(pid=>this.quests[pid]?.status==='done');
-      if(prereqMet){ q.status='active'; G.notify(`📋 New Quest: ${def.name}!`,3000); }
+      if(prereqMet && !def.giver){ q.status='active'; G.notify(`📋 New Quest: ${def.name}!`,3000); }
     });
   },
 
