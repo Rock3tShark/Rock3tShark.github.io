@@ -14,6 +14,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 #hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;}
 #hud-tl{position:absolute;top:12px;left:12px;background:linear-gradient(180deg,rgba(16,8,44,.96),rgba(6,4,18,.78));border:1px solid rgba(124,63,255,.35);box-shadow:0 0 32px rgba(123,47,255,.22);border-radius:16px;padding:14px 18px;min-width:210px;backdrop-filter:blur(14px);}
 #hud-tr{position:absolute;top:12px;right:12px;background:linear-gradient(180deg,rgba(12,6,28,.96),rgba(10,0,22,.82));border:1px solid rgba(255,130,220,.25);box-shadow:0 0 32px rgba(255,58,140,.18);border-radius:16px;padding:14px 18px;text-align:right;backdrop-filter:blur(14px);}
+#hud-coins{margin-top:10px;font-size:1rem;font-weight:800;color:#facc15;letter-spacing:1px;}
 .hname{font-size:.75rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:7px;}
 .blrow{margin-bottom:5px;}
 .bll{display:flex;justify-content:space-between;font-size:.62rem;color:#999;margin-bottom:2px;}
@@ -327,6 +328,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   <div id="hud-tr">
     <div class="hlabel">EXORCISED</div>
     <div class="hbig" id="h-kills">0</div>
+    <div id="hud-coins">✦ 0</div>
     <div style="margin-top:6px;font-size:.55rem;color:#555;letter-spacing:1px" id="h-title">Sorcerer</div>
   </div>
   <div id="mm-wrap">
@@ -335,7 +337,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   </div>
   <div id="hint">
     <b style="color:#aaa">WASD / ↑↓←→</b> — Move<br>
-    <b style="color:#aaa">E / SPACE</b> — Interact<br>
+    <b style="color:#aaa">E / SPACE</b> — Enter portals / interact<br>
     <b style="color:#aaa">Q</b> — Quest Log<br>
     <b style="color:#aaa">Walk into</b> enemies to battle
   </div>
@@ -429,7 +431,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 //  CONSTANTS
 // ═══════════════════════════════════════════
 const TS = 48; // tile size px
-const COLS = 120, ROWS = 84;
+const COLS = 150, ROWS = 96;
 
 const T = { GRASS:0, DIRT:1, ROAD:2, STONE:3, WATER:4, TREE:5,
             WALL:6, BUILDING:7, FLOOR:8, DARK:9, RUIN:10,
@@ -561,6 +563,36 @@ const CHARS = [
     {id:'shade', name:'NOCTURNAL CURTAIN', desc:'Enemy slow', cost:30, type:'spec', pow:[48,70], crit:18, debuff:{stat:'spd',val:.2,turns:2}, emoji:'🌒'},
     {id:'dance', name:'SILVER DANCE', desc:'Multi-hit combo', cost:40, type:'atk', pow:[60,90], crit:25, emoji:'💫'},
     {id:'dom', name:'MOONLIGHT SANTUARIO', desc:'Domain Expansion', cost:92, type:'domain', pow:[160,218], crit:29, emoji:'🌠'}
+   ]},
+  {id:'yuta', name:'YUTA OKKOTSU', title:'Cursed Vessel', emoji:'🔗', grade:'SPECIAL GRADE',
+   acc:'#f43f5e', ar:'244,63,94', spd:3.25,
+   hp:300, maxHp:300, ce:140, maxCe:140, ceRegen:23, hpRegen:0.18,
+   bodyColor:'#bf1650', hairColor:'#fde68a', outlineColor:'#881337',
+   moves:[
+    {id:'bind', name:'RESTRAINT BIND', desc:'Cursed chain strike', cost:20, type:'atk', pow:[52,78], crit:22, emoji:'🔗'},
+    {id:'curse', name:'CURSED FLAME', desc:'Flame burst attack', cost:35, type:'spec', pow:[84,120], crit:28, emoji:'🔥'},
+    {id:'merge', name:'CURSE AMPLIFY', desc:'Boost next attack', cost:35, type:'buff', buff:{stat:'atk',val:.35,turns:2}, emoji:'⚡'},
+    {id:'dom', name:'SEALED LOVE', desc:'Domain Expansion', cost:95, type:'domain', pow:[170,230], crit:32, emoji:'💠'}
+   ]},
+  {id:'mai', name:'MAI ZENIN', title:'Precision Shooter', emoji:'🎯', grade:'GRADE 1',
+   acc:'#fb7185', ar:'251,113,133', spd:3.0,
+   hp:275, maxHp:275, ce:125, maxCe:125, ceRegen:19, hpRegen:0.16,
+   bodyColor:'#9333ea', hairColor:'#fbcfe8', outlineColor:'#7e22ce',
+   moves:[
+    {id:'shot', name:'STAR SHOT', desc:'Precision ranged hit', cost:18, type:'atk', pow:[48,74], crit:24, emoji:'🎯'},
+    {id:'trap', name:'SNARE DOT', desc:'Trip wire DoT', cost:30, type:'spec', pow:[50,70], crit:18, dot:{dmg:22,turns:3}, emoji:'🪤'},
+    {id:'armor', name:'GILDED GUARD', desc:'Defense boost', cost:28, type:'buff', buff:{stat:'def',val:.3,turns:2}, emoji:'🛡️'},
+    {id:'dom', name:'GATE OF FATE', desc:'Domain Expansion', cost:88, type:'domain', pow:[150,208], crit:28, emoji:'🔮'}
+   ]},
+  {id:'choso', name:'CHOSO', title:'Blood Brother', emoji:'🩸', grade:'GRADE 1',
+   acc:'#ef4444', ar:'239,68,68', spd:3.1,
+   hp:295, maxHp:295, ce:115, maxCe:115, ceRegen:18, hpRegen:0.17,
+   bodyColor:'#881337', hairColor:'#f87171', outlineColor:'#7f1d1d',
+   moves:[
+    {id:'drip', name:'BLOOD DRIP', desc:'Piercing blood attack', cost:20, type:'atk', pow:[50,76], crit:24, emoji:'🩸'},
+    {id:'pulse', name:'RAGING PULSE', desc:'Enemy bleed and stun', cost:38, type:'spec', pow:[72,108], crit:28, emoji:'💥'},
+    {id:'flow', name:'HEMOGLOBIN WARD', desc:'Life shield', cost:25, type:'buff', buff:{stat:'def',val:.28,turns:2}, emoji:'🛡️'},
+    {id:'dom', name:'BLOOD REALM', desc:'Domain Expansion', cost:90, type:'domain', pow:[156,214], crit:30, emoji:'🩸'}
    ]}
 ];
 
@@ -586,7 +618,34 @@ const ZONES = [
   {name:'Cursed Forest',   bgHint:'#0a100a'},
   {name:'Demon Tower',     bgHint:'#100810'},
   {name:'Trade District',  bgHint:'#1a011a'},
+  {name:'Moonlit Falls',   bgHint:'#0a1030'},
   {name:'Shadow Realm',    bgHint:'#07070f'},
+];
+
+const ZONE_AREAS = [
+  {x1:1,x2:22,y1:1,y2:17},
+  {x1:32,x2:55,y1:2,y2:16},
+  {x1:26,x2:45,y1:20,y2:34},
+  {x1:56,x2:79,y1:24,y2:41},
+  {x1:66,x2:95,y1:2,y2:18},
+  {x1:1,x2:29,y1:42,y2:72},
+  {x1:40,x2:60,y1:44,y2:68},
+  {x1:24,x2:54,y1:74,y2:92},
+  {x1:104,x2:146,y1:58,y2:92},
+  {x1:76,x2:102,y1:46,y2:95},
+];
+
+const BOSS_TEMPLATES = [
+  {name:'ACADEMY WARDEN',    emoji:'🕯️', hp:520, ce:160, ceRegen:18, pow:[42,68], sp:[86,122], sc:35, sn:'Wailing Scream',   dp:[210,250], dn:'Soul Chamber',     acc:'#eab308', coin:[90,110]},
+  {name:'MARKET PHANTOM',    emoji:'🧿', hp:480, ce:150, ceRegen:20, pow:[40,66], sp:[82,118], sc:34, sn:'Blight Exchange',   dp:[198,236], dn:'Gilded Abyss',     acc:'#38bdf8', coin:[88,112]},
+  {name:'GATESPIRIT',        emoji:'⛩️', hp:500, ce:155, ceRegen:19, pow:[44,70], sp:[88,126], sc:36, sn:'Shrine Ruin',      dp:[205,245], dn:'Celestial Gate',   acc:'#a855f7', coin:[92,116]},
+  {name:'SHIBUYA RAVAGER',   emoji:'🚧', hp:540, ce:170, ceRegen:20, pow:[48,74], sp:[92,130], sc:38, sn:'Crowd Surge',      dp:[216,256], dn:'Neon Collapse',    acc:'#fb7185', coin:[98,128]},
+  {name:'ARCANIST OF RUIN',  emoji:'📜', hp:560, ce:175, ceRegen:21, pow:[52,78], sp:[96,138], sc:40, sn:'Runic Downpour',   dp:[224,264], dn:'Ancient Eclipse',  acc:'#8b5cf6', coin:[106,138]},
+  {name:'FOREST ABOMINATION', emoji:'🌲', hp:530, ce:165, ceRegen:19, pow:[46,72], sp:[90,128], sc:37, sn:'Rotting Vines',    dp:[212,250], dn:'Verdant Maw',      acc:'#22c55e', coin:[94,124]},
+  {name:'TOWER OVERLORD',    emoji:'🏯', hp:580, ce:180, ceRegen:22, pow:[54,80], sp:[100,142], sc:42, sn:'Spire Collapse',   dp:[230,270], dn:'Iron Citadel',    acc:'#f97316', coin:[110,142]},
+  {name:'COMMERCE GHOST',     emoji:'💰', hp:500, ce:160, ceRegen:19, pow:[44,70], sp:[86,124], sc:35, sn:'Debt Strike',      dp:[206,246], dn:'Market Maze',      acc:'#f59e0b', coin:[88,118]},
+  {name:'LUMINOUS WRAITH',   emoji:'🌙', hp:570, ce:175, ceRegen:21, pow:[52,80], sp:[98,140], sc:41, sn:'Moonlit Torrent',  dp:[228,268], dn:'Falling Cascade',  acc:'#60a5fa', coin:[112,146]},
+  {name:'SHADOW LORD',       emoji:'🌑', hp:620, ce:190, ceRegen:23, pow:[56,84], sp:[104,148], sc:44, sn:'Nightmare Burst',  dp:[240,284], dn:'Eclipse Realm',    acc:'#0f172a', coin:[124,160]},
 ];
 
 // ═══════════════════════════════════════════
@@ -662,16 +721,33 @@ function genMap() {
   rect(46,56,8,12,T.LAVA);
   rect(42,50,4,4,T.BUILDING);
 
-  // ── Shadow Realm (bottom-right) ──
-  for(let r=46;r<ROWS-1;r++) for(let c=60;c<COLS-1;c++) {
-    MAP[r][c]=Math.random()<0.35?T.RUIN:T.DARK;
+  // ── Shadow Realm (far right) ──
+  for(let r=46;r<ROWS-2;r++) for(let c=76;c<COLS-4;c++) {
+    MAP[r][c]=Math.random()<0.34?T.RUIN:T.DARK;
   }
-  rect(66,50,10,8,T.RUIN);
-  rect(76,56,8,8,T.DARK);
-  rect(86,60,6,6,T.LAVA);
+  rect(76,50,10,8,T.RUIN);
+  rect(88,56,8,10,T.DARK);
+  rect(96,68,6,12,T.LAVA);
+  rect(104,62,10,14,T.CRYSTAL);
+
+  // ── Trade District (bottom-center) ──
+  rect(24,74,32,18,T.ROAD);
+  for(let br=76;br<90;br+=5) for(let bc=28;bc<54;bc+=6){ rect(bc,br,4,4,T.BUILDING); }
+  for(let c=28;c<54;c+=10){ MAP[74][c]=T.BRIDGE; }
+  rect(34,78,6,4,T.SAND);
+  rect(46,82,6,6,T.STONE);
+
+  // ── Moonlit Falls (far right) ──
+  for(let r=58;r<88;r+=4){
+    for(let c=108;c<COLS-4;c+=8){ MAP[r][c]=T.WATER; }
+  }
+  rect(106,64,22,10,T.FLOOR);
+  rect(110,68,14,8,T.CRYSTAL);
+  for(let c=108;c<132;c+=10){ MAP[76][c]=T.BRIDGE; }
+  rect(118,72,8,12,T.LAVA);
 
   // ── Forest & crystal accents ──
-  for(let i=0;i<280;i++){
+  for(let i=0;i<320;i++){
     let r=ri(2,ROWS-2),c=ri(2,COLS-2);
     if(MAP[r][c]===T.GRASS) MAP[r][c]=Math.random()<0.65?T.TREE:T.STONE;
     else if(MAP[r][c]===T.SAND && Math.random()<0.08) MAP[r][c]=T.CRYSTAL;
@@ -687,8 +763,10 @@ function genMap() {
     {c:76,r:8, label:'ANCIENT RUINS',  zoneIdx:4},
     {c:12,r:52,label:'CURSED FOREST', zoneIdx:5},
     {c:48,r:44,label:'DEMON TOWER',   zoneIdx:6},
-    {c:78,r:56,label:'SHADOW REALM',  zoneIdx:7},
-  ].forEach(p=>{ MAP[p.r][p.c]=T.PORTAL; PORTALS.push(p); });
+    {c:36,r:78,label:'TRADE DISTRICT',zoneIdx:7},
+    {c:116,r:72,label:'MOONLIT FALLS', zoneIdx:8},
+    {c:92,r:58, label:'SHADOW REALM',  zoneIdx:9},
+  ].forEach(p=>{ MAP[p.r][p.c]=T.PORTAL; p.cleared=false; p.boss=BOSS_TEMPLATES[p.zoneIdx]; PORTALS.push(p); });
 }
 
 function rect(c,r,w,h,t){
@@ -781,7 +859,7 @@ const G = {
     this.kills = 0;
     this.zoneIdx = 0;
     this.spawnPlayer();
-    this.spawnEnemies(46);
+    this.spawnEnemies(64);
     QM.init();
     this.running = true;
     this.last = performance.now();
@@ -799,6 +877,7 @@ const G = {
       frame: 0, frameTick: 0,
       moving: false,
       buffs:[], debuffs:[], dots:[],
+      coins: 0,
       invTimer: 0,
       stepTimer: 0,
     };
@@ -897,25 +976,22 @@ const G = {
 
     // ── Zone detection ──
     let col=Math.floor(p.x/TS), row=Math.floor(p.y/TS);
-    let z=0;
-    if(col>=1&&col<=22&&row>=1&&row<=17) z=0;
-    else if(col>=32&&col<=55&&row>=2&&row<=16) z=1;
-    else if(col>=26&&col<=45&&row>=20&&row<=34) z=2;
-    else if(col>=56&&col<=79&&row>=24&&row<=41) z=3;
-    else if(col>=66&&col<=95&&row>=2&&row<=18) z=4;
-    else if(col<=29&&row>=42) z=5;
-    else if(col>=40&&col<=60&&row>=44&&row<=67) z=6;
-    else if(col>=76&&row>=46) z=7;
-    else if(col>=60&&row>=46) z=8;
+    const area = ZONE_AREAS.find(a=>col>=a.x1&&col<=a.x2&&row>=a.y1&&row<=a.y2);
+    let z = area ? ZONE_AREAS.indexOf(area) : this.zoneIdx;
     if(z!==this.zoneIdx){ this.zoneIdx=z; this.notify('📍 '+ZONES[z].name); QM.onVisitZone(z); }
 
     // Interact prompt
     let nearPortal = this.nearestPortal(col,row);
-    document.getElementById('interact').style.opacity = nearPortal?'1':'0';
+    if(nearPortal){
+      document.getElementById('interact').textContent = `Press E to enter ${nearPortal.label}`;
+      document.getElementById('interact').style.opacity='1';
+    } else {
+      document.getElementById('interact').style.opacity='0';
+    }
 
     if((this.keys['KeyE']||this.keys['e']||this.keys['Space'])&&nearPortal) {
       this.keys['KeyE']=false; this.keys['e']=false; this.keys['Space']=false;
-      this.notify('✨ Teleported to '+nearPortal.label);
+      this.enterPortal(nearPortal);
     }
 
     // ── Enemy AI ──
@@ -957,7 +1033,7 @@ const G = {
     });
 
     // Spawn more enemies if needed
-    if(this.enemies.length<20) this.trySpawnEnemy();
+    if(this.enemies.length<28) this.trySpawnEnemy();
   },
 
   canWalk(wx,wy) {
@@ -968,6 +1044,29 @@ const G = {
 
   nearestPortal(col,row) {
     return PORTALS.find(p=>Math.abs(p.c-col)<=1&&Math.abs(p.r-row)<=1)||null;
+  },
+
+  enterPortal(portal) {
+    if(portal.cleared){
+      this.notify(`✨ ${portal.label} portal already stabilized.`);
+      return;
+    }
+    this.notify(`🌌 Entering portal to ${portal.label}...`);
+    this.player.x = (portal.c + 0.5) * TS;
+    this.player.y = (portal.r + 1.2) * TS;
+    setTimeout(()=>this.startBossFight(portal), 500);
+  },
+
+  startBossFight(portal) {
+    const boss = JSON.parse(JSON.stringify(portal.boss || BOSS_TEMPLATES[portal.zoneIdx]));
+    boss.id = `boss_${portal.zoneIdx}`;
+    boss.grade = 'BOSS';
+    boss.maxHp = boss.hp;
+    boss.maxCe = boss.ce;
+    boss.buffs=[]; boss.debuffs=[]; boss.dots=[];
+    boss.coin = ri(boss.coin[0], boss.coin[1]);
+    boss.frame=0; boss.frameTick=0;
+    this.startCombat(boss, {bossPortal: portal});
   },
 
   // ── DRAW ──
@@ -1078,49 +1177,53 @@ const G = {
       ctx.beginPath(); ctx.arc(sx+26,sy+14,9,0,Math.PI*2); ctx.fill();
     }
     else if(t===T.BUILDING) {
-      ctx.fillStyle='#221f4d';
+      const grad=ctx.createLinearGradient(sx,sy,sx+TS,sy+TS);
+      grad.addColorStop(0,'rgba(138,43,226,0.95)');
+      grad.addColorStop(1,'rgba(34,31,77,0.95)');
+      ctx.fillStyle=grad;
       ctx.fillRect(sx+2,sy+2,TS-4,TS-4);
-      ctx.strokeStyle='rgba(150,110,255,0.3)';
+      ctx.strokeStyle='rgba(255,255,255,0.12)';
       ctx.lineWidth=1.5;
       ctx.strokeRect(sx+2,sy+2,TS-4,TS-4);
-      // Windows
-      ctx.fillStyle='rgba(164,144,255,0.32)';
+      // WINDOWS
+      ctx.fillStyle='rgba(200,180,255,0.28)';
       ctx.fillRect(sx+8,sy+8,10,10);
       ctx.fillRect(sx+30,sy+8,10,10);
-      ctx.fillStyle='rgba(255,255,255,0.08)';
+      ctx.fillStyle='rgba(255,255,255,0.1)';
       ctx.fillRect(sx+18,sy+18,12,6);
       ctx.strokeStyle='rgba(255,255,255,0.08)';
       ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(sx+10,sy+20); ctx.lineTo(sx+38,sy+20); ctx.stroke();
     }
     else if(t===T.WALL) {
-      ctx.fillStyle='#0f0f1e';
+      ctx.fillStyle='rgba(15,15,30,0.98)';
       ctx.fillRect(sx,sy,TS,TS);
-      ctx.strokeStyle='rgba(60,60,100,0.4)';
+      ctx.strokeStyle='rgba(80,80,120,0.35)';
       ctx.lineWidth=1;
       ctx.strokeRect(sx,sy,TS,TS);
     }
     else if(t===T.PORTAL) {
-      let pulse=0.6+Math.sin(Date.now()*0.005)*0.35;
-      ctx.fillStyle=`rgba(100,0,220,${pulse*0.5})`;
+      const pulse=0.6+Math.sin(Date.now()*0.005)*0.35;
+      ctx.shadowBlur=18;
+      ctx.shadowColor='rgba(165,95,255,0.55)';
+      ctx.fillStyle=`rgba(120,40,220,${pulse*0.45})`;
       ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle=`rgba(180,80,255,${pulse})`;
-      ctx.lineWidth=2;
+      ctx.shadowBlur=0;
+      ctx.strokeStyle=`rgba(220,150,255,${pulse})`;
+      ctx.lineWidth=2.2;
       ctx.beginPath(); ctx.arc(sx+24,sy+24,20,0,Math.PI*2); ctx.stroke();
-      // Rotating ring
       ctx.save();
       ctx.translate(sx+24,sy+24);
-      ctx.rotate(Date.now()*0.002);
-      ctx.strokeStyle=`rgba(220,120,255,${pulse*0.7})`;
+      ctx.rotate(Date.now()*0.0025);
+      ctx.strokeStyle=`rgba(255,200,255,${pulse*0.75})`;
       ctx.lineWidth=1.5;
-      ctx.setLineDash([5,8]);
-      ctx.beginPath(); ctx.arc(0,0,15,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([4,6]);
+      ctx.beginPath(); ctx.arc(0,0,14,0,Math.PI*2); ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
-      // Label
       let port=PORTALS.find(p=>p.c===c&&p.r===r);
-      if(port) {
-        ctx.fillStyle='rgba(200,120,255,0.85)';
+      if(port){
+        ctx.fillStyle='rgba(245,200,255,0.9)';
         ctx.font='bold 8px Segoe UI';
         ctx.textAlign='center';
         ctx.fillText(port.label,sx+24,sy+TS+10);
@@ -1128,10 +1231,14 @@ const G = {
       }
     }
     else if(t===T.SHRINE) {
-      ctx.fillStyle='rgba(60,0,120,0.7)';
+      const grad=ctx.createRadialGradient(sx+24,sy+24,4,sx+24,sy+24,22);
+      grad.addColorStop(0,'rgba(205,120,255,0.85)');
+      grad.addColorStop(1,'rgba(60,0,120,0.72)');
+      ctx.fillStyle=grad;
       ctx.fillRect(sx+4,sy+4,TS-8,TS-8);
       ctx.font='22px serif';
       ctx.textAlign='center';
+      ctx.fillStyle='rgba(255,250,240,0.92)';
       ctx.fillText('⛩️',sx+24,sy+30);
       ctx.textAlign='left';
       let gp=0.3+Math.sin(Date.now()*0.004)*0.15;
@@ -1139,9 +1246,14 @@ const G = {
       ctx.beginPath(); ctx.arc(sx+24,sy+24,22,0,Math.PI*2); ctx.fill();
     }
     else if(t===T.ROAD||t===T.FLOOR||t===T.BRIDGE) {
-      ctx.strokeStyle='rgba(255,255,255,0.04)';
-      ctx.lineWidth=.5;
-      ctx.strokeRect(sx,sy,TS,TS);
+      const grad = ctx.createLinearGradient(sx,sy,sx,sy+TS);
+      grad.addColorStop(0,'rgba(255,255,255,0.08)');
+      grad.addColorStop(1,TC[t]);
+      ctx.fillStyle = grad;
+      ctx.fillRect(sx,sy,TS,TS);
+      ctx.strokeStyle='rgba(255,255,255,0.06)';
+      ctx.lineWidth=0.9;
+      ctx.strokeRect(sx+1,sy+1,TS-2,TS-2);
     }
     else if(t===T.DARK) {
       // Random cursed particles
@@ -1380,6 +1492,7 @@ const G = {
 
     document.getElementById('h-zone').textContent='📍 '+ZONES[this.zoneIdx].name;
     document.getElementById('h-kills').textContent=this.kills;
+    document.getElementById('h-coins').textContent='✦ '+(this.player.coins||0);
     document.getElementById('h-title').textContent=LV.getTitle(lv);
   },
 
@@ -1407,7 +1520,7 @@ const G = {
   // ═══════════════════════════════════════════
   //  COMBAT SYSTEM
   // ═══════════════════════════════════════════
-  startCombat(enemy) {
+  startCombat(enemy, opts={}) {
     this.inCombat=true;
     this.combat={
       player: JSON.parse(JSON.stringify(this.player)),
@@ -1417,7 +1530,8 @@ const G = {
         maxCe:enemy.maxCe||enemy.ce,
       },
       pTurn:true, round:1,
-      enemy_ref: enemy, // ref to world enemy
+      enemy_ref: enemy, // ref to world enemy or boss
+      bossPortal: opts.bossPortal || null,
     };
     this.combat.player.buffs=[...this.player.buffs];
     this.combat.player.debuffs=[...this.player.debuffs];
@@ -1606,6 +1720,9 @@ const G = {
     const {player:p,enemy:e}=this.combat;
     if(e.hp<=0){
       this.kills++;
+      const coinGain = e.coin || 0;
+      this.player.coins = (this.player.coins||0) + coinGain;
+      if(coinGain) this.floatText(this.player.x,this.player.y-28,'+'+coinGain+' ✦','#facc15',16);
       // Award XP
       const xpResult = LV.awardXp(this.player, e);
       this.combat._xpGained = xpResult.gained;
@@ -1618,6 +1735,10 @@ const G = {
       this.combat.player.moves  = this.player.moves;
       QM.onKill(e);
       QM.onBattleWin(p.hp, p.maxHp);
+      if(this.combat.bossPortal){
+        this.combat.bossPortal.cleared=true;
+        this.notify(`🏆 Boss defeated at ${this.combat.bossPortal.label}!`);
+      }
       this.clog(`🏆 <strong>${e.name} exorcised!</strong> (+${xpResult.gained} XP)`,'s');
       if(xpResult.levelsGained.length) this.clog(`✨ LEVEL UP! Now LV ${this.player.level}!`,'h');
       setTimeout(()=>this.showResult(true),600);
@@ -1649,17 +1770,19 @@ const G = {
       this.player.buffs=this.combat.player.buffs;
       this.player.debuffs=this.combat.player.debuffs;
       this.player.dots=this.combat.player.dots;
-      // Remove world enemy
-      this.enemies=this.enemies.filter(e=>e!==this.combat.enemy_ref);
-      // XP float text
+      if(!this.combat.bossPortal){
+        this.enemies=this.enemies.filter(e=>e!==this.combat.enemy_ref);
+      }
+      // XP and coin float text
       const xg=this.combat._xpGained||0;
+      const coinGain=this.combat.enemy.coin||0;
       const lvs=this.combat._levelsGained||[];
       this.floatText(this.player.x,this.player.y-40,'+'+xg+' XP','#fbbf24',16);
-      // Result screen XP line
+      if(coinGain) this.floatText(this.player.x,this.player.y-24,'+'+coinGain+' ✦','#facc15',16);
+      // Result screen stats
       const lv=this.player.level;
-      const xpPct=Math.floor((this.player.xp/this.player.xpToNext)*100);
-      let xpLine=`+${xg} XP  •  LV ${lv} — ${LV.getTitle(lv)}`;
-      if(lvs.length) xpLine=`✨ LEVEL UP → LV ${lv}!  +${xg} XP`;
+      let xpLine = lvs.length ? `✨ LEVEL UP → LV ${lv}!  +${xg} XP` : `+${xg} XP  •  LV ${lv} — ${LV.getTitle(lv)}`;
+      if(coinGain) xpLine += `  •  +${coinGain} Coins`;
       document.getElementById('r-xp').textContent=xpLine;
     } else {
       document.getElementById('r-xp').textContent='';
@@ -1783,6 +1906,7 @@ const XP_BY_GRADE = {
   'GRADE 2':        40,
   'GRADE 1':        80,
   'SPECIAL GRADE': 160,
+  'BOSS':          240,
 };
 
 // Stat gains per level-up
